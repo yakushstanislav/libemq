@@ -1,0 +1,67 @@
+OBJ=emq.o network.o packet.o
+LIBNAME=libemq
+
+LIBEMQ_MAJOR=0
+LIBEMQ_MINOR=0
+
+CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+OPTIMIZATION?=-O3
+WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
+DEBUG?= -g -ggdb
+COMPILE_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG)
+COMPILE_LDFLAGS=$(LDFLAGS)
+
+DYNAMIC_LIB_SUFFIX=so
+STATIC_LIB_SUFFIX=a
+DYNAMIC_LIB_MINOR_NAME=$(LIBNAME).$(DYNAMIC_LIB_SUFFIX).$(LIBEMQ_MAJOR).$(LIBEMQ_MINOR)
+DYNAMIC_LIB_MAJOR_NAME=$(LIBNAME).$(DYNAMIC_LIB_SUFFIX).$(LIBEMQ_MAJOR)
+DYNAMIC_LIB_NAME=$(LIBNAME).$(DYNAMIC_LIB_SUFFIX)
+DYNAMIC_LIB_MAKE_CMD=$(CC) -shared -Wl,-soname,$(DYNAMIC_LIB_MINOR_NAME) -o $(DYNAMIC_LIB_NAME) $(LDFLAGS)
+STATIC_LIB_NAME=$(LIBNAME).$(STATIC_LIB_SUFFIX)
+STATIC_LIB_MAKE_CMD=ar rcs $(STATIC_LIB_NAME)
+
+all: $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME)
+
+# make dep
+emq.o: emq.c emq.h network.h protocol.h packet.h
+network.o: network.c fmacros.h emq.h network.h
+packet.o: packet.c emq.h packet.h protocol.h
+
+$(DYNAMIC_LIB_NAME): $(OBJ)
+	$(DYNAMIC_LIB_MAKE_CMD) $(OBJ)
+
+$(STATIC_LIB_NAME): $(OBJ)
+	$(STATIC_LIB_MAKE_CMD) $(OBJ)
+
+dynamic: $(DYNAMIC_LIB_NAME)
+static: $(STATIC_LIB_NAME)
+
+.c.o:
+	$(CC) -std=c99 -pedantic -c $(COMPILE_CFLAGS) $<
+
+clean:
+	rm -rf $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) *.o *.gcda *.gcno *.gcov
+
+dep:
+	$(CC) -MM *.c
+
+PREFIX?=/usr/local
+INCLUDE_PATH?=include/emq
+LIBRARY_PATH?=lib
+INSTALL_INCLUDE_PATH=$(PREFIX)/$(INCLUDE_PATH)
+INSTALL_LIBRARY_PATH=$(PREFIX)/$(LIBRARY_PATH)
+INSTALL?=cp -a
+
+install: $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME)
+	mkdir -p $(INSTALL_INCLUDE_PATH) $(INSTALL_LIBRARY_PATH)
+	$(INSTALL) emq.h $(INSTALL_INCLUDE_PATH)
+	$(INSTALL) $(DYNAMIC_LIB_NAME) $(INSTALL_LIBRARY_PATH)/$(DYNAMIC_LIB_MINOR_NAME)
+	cd $(INSTALL_LIBRARY_PATH) && ln -sf $(DYNAMIC_LIB_MINOR_NAME) $(DYNAMIC_LIB_MAJOR_NAME)
+	cd $(INSTALL_LIBRARY_PATH) && ln -sf $(DYNAMIC_LIB_MAJOR_NAME) $(DYNAMIC_LIB_NAME)
+	$(INSTALL) $(STATIC_LIB_NAME) $(INSTALL_LIBRARY_PATH)
+
+uninstall:
+	rm -rf $(INSTALL_INCLUDE_PATH)
+	rm -rf $(INSTALL_LIBRARY_PATH)/$(LIBNAME)*
+
+.PHONY: all dynamic static dep install clean
