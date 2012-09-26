@@ -34,6 +34,18 @@
 #include "protocol.h"
 #include "packet.h"
 
+#define EMQ_LIST_SET_FREE_METHOD(l, m) ((l)->free = (m))
+#define EMQ_LIST_GET_FREE_METHOD(l) ((l)->free)
+
+static const char *emq_error_array[] = {
+	"",
+	"Error allocate memory\n",
+	"Error input data\n",
+	"Error write request\n",
+	"Error read request\n",
+	"Error response\n"
+};
+
 static emq_client *emq_client_init(void)
 {
 	emq_client *client;
@@ -45,6 +57,8 @@ static emq_client *emq_client_init(void)
 	}
 
 	memset(client, 0, sizeof(*client));
+
+	EMQ_CLEAR_ERROR(client);
 
 	client->status = EMQ_STATUS_OK;
 	client->request = (char*)malloc(EMQ_DEFAULT_REQUEST_SIZE);
@@ -65,6 +79,11 @@ static void emq_client_release(emq_client *client)
 {
 	free(client->request);
 	free(client);
+}
+
+static void emq_client_set_error(emq_client *client, int error)
+{
+	snprintf(client->error, sizeof(client->error), emq_error_array[error]);
 }
 
 static emq_list *emq_list_init(void)
@@ -255,8 +274,9 @@ emq_client *emq_tcp_connect(const char *addr, int port)
 		return NULL;
 	}
 
+	EMQ_CLEAR_ERROR(client);
+
 	if ((emq_client_tcp_connect(client, addr, port)) == EMQ_NET_ERR) {
-		EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
 		emq_client_release(client);
 		return NULL;
 	}
@@ -273,8 +293,9 @@ emq_client *emq_unix_connect(const char *path)
 		return NULL;
 	}
 
+	EMQ_CLEAR_ERROR(client);
+
 	if ((emq_client_unix_connect(client, path)) == EMQ_NET_ERR) {
-		EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
 		emq_client_release(client);
 		return NULL;
 	}
@@ -295,20 +316,26 @@ int emq_auth(emq_client *client, const char *name, const char *password)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_auth_request(client, name, password) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_AUTH,
 		EMQ_PROTOCOL_SUCCESS_AUTH, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -324,20 +351,26 @@ int emq_ping(emq_client *client)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_ping_request(client) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_PING,
 		EMQ_PROTOCOL_SUCCESS_PING, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -353,20 +386,26 @@ int emq_stat(emq_client *client, emq_status *status)
 {
 	protocol_response_stat response;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_stat_request(client) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&response, sizeof(response)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_STAT,
 		EMQ_PROTOCOL_SUCCESS_STAT, sizeof(response.body)) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -384,20 +423,26 @@ int emq_user_create(emq_client *client, const char *name, const char *password, 
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_user_create_request(client, name, password, perm) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_CREATE,
 		EMQ_PROTOCOL_SUCCESS_USER_CREATE, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -417,35 +462,44 @@ emq_list *emq_user_list(emq_client *client)
 	char *buffer;
 	uint32_t i;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_user_list_request(client) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_USER_LIST ||
 		header.status != EMQ_PROTOCOL_SUCCESS_USER_LIST) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
 	buffer = (char*)malloc(header.bodylen);
 	if (!buffer) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		goto error;
 	}
 
 	if (emq_client_read(client, buffer, header.bodylen) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		free(buffer);
 		goto error;
 	}
 
 	list = emq_list_init();
 	if (!list) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		free(buffer);
 		goto error;
 	}
@@ -456,6 +510,7 @@ emq_list *emq_user_list(emq_client *client)
 	{
 		user = emq_user_init();
 		if (!user) {
+			emq_client_set_error(client, EMQ_ERROR_ALLOC);
 			emq_list_release(list);
 			free(buffer);
 			goto error;
@@ -483,20 +538,26 @@ int emq_user_rename(emq_client *client, const char *from, const char *to)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_user_rename_request(client, from, to) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_RENAME,
 		EMQ_PROTOCOL_SUCCESS_USER_RENAME, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -512,20 +573,26 @@ int emq_user_set_perm(emq_client *client, const char *name, uint64_t perm)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_user_set_perm_request(client, name, perm) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_SET_PERM,
 		EMQ_PROTOCOL_SUCCESS_USER_SET_PERM, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -541,20 +608,26 @@ int emq_user_delete(emq_client *client, const char *name)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_user_delete_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_DELETE,
 		EMQ_PROTOCOL_SUCCESS_USER_DELETE, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -570,20 +643,26 @@ int emq_queue_create(emq_client *client, const char *name, uint32_t max_msg, uin
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_create_request(client, name, max_msg, max_msg_size, flags) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_CREATE,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_CREATE, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -599,20 +678,26 @@ int emq_queue_declare(emq_client *client, const char *name)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_declare_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_DECLARE,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_DECLARE, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -628,20 +713,26 @@ int emq_queue_exist(emq_client *client, const char *name)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_exist_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_EXIST,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -661,35 +752,44 @@ emq_list *emq_queue_list(emq_client *client)
 	char *buffer;
 	uint32_t i;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_list_request(client) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_QUEUE_LIST ||
 		header.status != EMQ_PROTOCOL_SUCCESS_QUEUE_LIST) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
 	buffer = (char*)malloc(header.bodylen);
 	if (!buffer) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		goto error;
 	}
 
 	if (emq_client_read(client, buffer, header.bodylen) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		free(buffer);
 		goto error;
 	}
 
 	list = emq_list_init();
 	if (!list) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		free(buffer);
 		goto error;
 	}
@@ -700,6 +800,7 @@ emq_list *emq_queue_list(emq_client *client)
 	{
 		queue = emq_queue_init();
 		if (!queue) {
+			emq_client_set_error(client, EMQ_ERROR_ALLOC);
 			emq_list_release(list);
 			free(buffer);
 			goto error;
@@ -731,24 +832,31 @@ size_t emq_queue_size(emq_client *client, const char *name)
 {
 	protocol_response_queue_size response;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_size_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&response.header, sizeof(response.header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_QUEUE_SIZE,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_SIZE, sizeof(response.body)) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&response.body, sizeof(response.body)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
@@ -764,28 +872,36 @@ int emq_queue_push(emq_client *client, const char *name, emq_msg *msg)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (msg->size < 1) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_queue_push_request(client, name, msg->size) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_write(client, msg->data, msg->size) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_PUSH,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_PUSH, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -803,6 +919,7 @@ static emq_msg *emq_read_message(emq_client *client, size_t size)
 
 	msg = (emq_msg*)malloc(sizeof(*msg));
 	if (!msg) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		return NULL;
 	}
 
@@ -810,11 +927,13 @@ static emq_msg *emq_read_message(emq_client *client, size_t size)
 	msg->size = size;
 
 	if (!msg->data) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		free(msg);
 		return NULL;
 	}
 
 	if (emq_client_read(client, (char*)msg->data, msg->size) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		return NULL;
 	}
 
@@ -826,20 +945,26 @@ emq_msg *emq_queue_get(emq_client *client, const char *name)
 	protocol_response_header header;
 	emq_msg *msg;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_get_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_QUEUE_GET ||
 		header.status != EMQ_PROTOCOL_SUCCESS_QUEUE_GET) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -860,20 +985,26 @@ emq_msg *emq_queue_pop(emq_client *client, const char *name)
 	protocol_response_header header;
 	emq_msg *msg;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_pop_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_QUEUE_POP ||
 		header.status != EMQ_PROTOCOL_SUCCESS_QUEUE_POP) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -893,20 +1024,26 @@ int emq_queue_purge(emq_client *client, const char *name)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_purge_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_PURGE,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_PURGE, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
@@ -922,20 +1059,26 @@ int emq_queue_delete(emq_client *client, const char *name)
 {
 	protocol_response_header header;
 
+	EMQ_CLEAR_ERROR(client);
+
 	if (emq_queue_delete_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
 
 	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
 		goto error;
 	}
 
 	if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_DELETE,
 		EMQ_PROTOCOL_SUCCESS_QUEUE_DELETE, 0) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 

@@ -44,28 +44,41 @@
 #define EMQ_GET_STATUS(client) (client->status)
 #define EMQ_SET_STATUS(client, value) (client->status = value)
 
+#define EMQ_LIST_LENGTH(l) ((l)->length)
+#define EMQ_LIST_VALUE(n) ((n)->value)
+
 #define EMQ_SET_PERM(a, b) ((a) |= (1<<(b)))
 #define EMQ_CHECK_PERM(a, b) ((a) & (1<<(b)))
 
-#define EMQ_USER_QUEUE_PERM 0
-#define EMQ_USER_ADMIN_PERM 5
-#define EMQ_USER_NOT_CHANGE_PERM 6
-
-#define EMQ_USER_QUEUE_CREATE_PERM 10
-#define EMQ_USER_QUEUE_DECLARE_PERM 11
-#define EMQ_USER_QUEUE_EXIST_PERM 12
-#define EMQ_USER_QUEUE_LIST_PERM 13
-#define EMQ_USER_QUEUE_SIZE_PERM 14
-#define EMQ_USER_QUEUE_PUSH_PERM 15
-#define EMQ_USER_QUEUE_GET_PERM 16
-#define EMQ_USER_QUEUE_POP_PERM 17
-#define EMQ_USER_QUEUE_SUBSCRIBE_PERM 18
-#define EMQ_USER_QUEUE_UNSUBSCRIBE_PERM 19
-#define EMQ_USER_QUEUE_PURGE_PERM 20
-#define EMQ_USER_QUEUE_DELETE_PERM 21
+#define EMQ_QUEUE_PERM_BIT 0
+#define EMQ_ADMIN_PERM_BIT 5
+#define EMQ_NOT_CHANGE_PERM_BIT 6
+#define EMQ_QUEUE_CREATE_PERM_BIT 10
+#define EMQ_QUEUE_DECLARE_PERM_BIT 11
+#define EMQ_QUEUE_EXIST_PERM_BIT 12
+#define EMQ_QUEUE_LIST_PERM_BIT 13
+#define EMQ_QUEUE_SIZE_PERM_BIT 14
+#define EMQ_QUEUE_PUSH_PERM_BIT 15
+#define EMQ_QUEUE_GET_PERM_BIT 16
+#define EMQ_QUEUE_POP_PERM_BIT 17
+#define EMQ_QUEUE_SUBSCRIBE_BIT_PERM 18
+#define EMQ_QUEUE_UNSUBSCRIBE_PERM_BIT 19
+#define EMQ_QUEUE_PURGE_PERM_BIT 20
+#define EMQ_QUEUE_DELETE_PERM_BIT 21
 
 #define EMQ_MAX_MSG 4294967295
 #define EMQ_MAX_MSG_SIZE 2147483647
+
+#define EMQ_ERROR_NONE 0
+#define EMQ_ERROR_ALLOC 1
+#define EMQ_ERROR_DATA 2
+#define EMQ_ERROR_WRITE 3
+#define EMQ_ERROR_READ 4
+#define EMQ_ERROR_RESPONSE 5
+
+#define EMQ_GET_ERROR(client) (client->error)
+#define EMQ_ISSET_ERROR(client) (client->error[0] != '\0')
+#define EMQ_CLEAR_ERROR(client) (client->error[0] = '\0')
 
 typedef uint64_t emq_user_perm;
 
@@ -78,14 +91,18 @@ typedef struct emq_client {
 	int fd;
 } emq_client;
 
-#define EMQ_LIST_START_HEAD 0
-#define EMQ_LIST_START_TAIL 1
+typedef struct emq_user {
+	char name[32];
+	char password[32];
+	uint64_t perm;
+} emq_user;
 
-#define EMQ_LIST_LENGTH(l) ((l)->length)
-#define EMQ_LIST_VALUE(n) ((n)->value)
-
-#define EMQ_LIST_SET_FREE_METHOD(l, m) ((l)->free = (m))
-#define EMQ_LIST_GET_FREE_METHOD(l) ((l)->free)
+typedef struct emq_queue {
+	char name[64];
+	uint32_t max_msg;
+	uint32_t max_msg_size;
+	uint32_t flags;
+} emq_queue;
 
 typedef struct emq_list_node {
 	struct emq_list_node *prev;
@@ -133,19 +150,6 @@ typedef struct emq_status {
 	uint32_t resv3;
 	uint32_t resv4;
 } emq_status;
-
-typedef struct emq_user {
-	char name[32];
-	char password[32];
-	uint64_t perm;
-} emq_user;
-
-typedef struct emq_queue {
-	char name[64];
-	uint32_t max_msg;
-	uint32_t max_msg_size;
-	uint32_t flags;
-} emq_queue;
 
 #pragma pack(pop)
 
