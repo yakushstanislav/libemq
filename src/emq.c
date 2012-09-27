@@ -260,6 +260,16 @@ emq_msg *emq_msg_copy(emq_msg *msg)
 	return new_msg;
 }
 
+void *emq_msg_data(emq_msg *msg)
+{
+	return msg->data;
+}
+
+size_t emq_msg_size(emq_msg *msg)
+{
+	return msg->size;
+}
+
 void emq_msg_release(emq_msg *msg)
 {
 	free(msg->data);

@@ -155,6 +155,8 @@ typedef struct emq_status {
 
 emq_msg *emq_msg_create(void *data, size_t size);
 emq_msg *emq_msg_copy(emq_msg *msg);
+void *emq_msg_data(emq_msg *msg);
+size_t emq_msg_size(emq_msg *msg);
 void emq_msg_release(emq_msg *msg);
 
 emq_client *emq_tcp_connect(const char *addr, int port);
