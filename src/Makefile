@@ -1,4 +1,5 @@
 OBJ=emq.o network.o packet.o
+BINS=example
 LIBNAME=libemq
 
 LIBEMQ_MAJOR=0
@@ -20,7 +21,7 @@ DYNAMIC_LIB_MAKE_CMD=$(CC) -shared -Wl,-soname,$(DYNAMIC_LIB_MINOR_NAME) -o $(DY
 STATIC_LIB_NAME=$(LIBNAME).$(STATIC_LIB_SUFFIX)
 STATIC_LIB_MAKE_CMD=ar rcs $(STATIC_LIB_NAME)
 
-all: $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME)
+all: $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) $(BINS)
 
 # make dep
 emq.o: emq.c emq.h network.h protocol.h packet.h
@@ -36,11 +37,14 @@ $(STATIC_LIB_NAME): $(OBJ)
 dynamic: $(DYNAMIC_LIB_NAME)
 static: $(STATIC_LIB_NAME)
 
+example: $(STATIC_LIB_NAME)
+	$(CC) -o $@ $(COMPILE_LDFLAGS) example.c $(STATIC_LIB_NAME)
+
 .c.o:
 	$(CC) -std=c99 -pedantic -c $(COMPILE_CFLAGS) $<
 
 clean:
-	rm -rf $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) *.o *.gcda *.gcno *.gcov
+	rm -rf $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) $(BINS) *.o *.gcda *.gcno *.gcov
 
 dep:
 	$(CC) -MM *.c
