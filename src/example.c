@@ -76,7 +76,7 @@ static void user_management(emq_client *client)
 	/* Request the list of users */
 	users = emq_user_list(client);
 	if (users != NULL) {
-		/* Enumeration of all users */
+		/* Enumeration all users */
 		emq_list_rewind(users, &iter);
 		while ((node = emq_list_next(&iter)) != NULL)
 		{
@@ -106,7 +106,7 @@ static void user_management(emq_client *client)
 	status = emq_user_delete(client, "first.user");
 	CHECK_STATUS("User delete", status);
 
-	/* Delete user with name "user_2" */
+	/* Delete user with name "user" */
 	status = emq_user_delete(client, "user");
 	CHECK_STATUS("User delete", status);
 }
@@ -224,7 +224,7 @@ static void queue_management(emq_client *client)
 		}
 	}
 
-	/* Get size queue with name ".queue-2" */
+	/* Get size queue with name "queue-2" */
 	queue_size = emq_queue_size(client, "queue-2");
 	printf("[\033[0;33mSuccess\033[0;0m] Queue \"queue-2\" size: %zu\n", queue_size);
 

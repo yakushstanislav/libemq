@@ -218,7 +218,7 @@ static void emq_queue_list_free_handler(void *value)
 	emq_queue_release(queue);
 }
 
-emq_msg *emq_msg_create(void *data, size_t size)
+emq_msg *emq_msg_create(const void *data, size_t size)
 {
 	emq_msg *msg;
 

@@ -153,7 +153,7 @@ typedef struct emq_status {
 
 #pragma pack(pop)
 
-emq_msg *emq_msg_create(void *data, size_t size);
+emq_msg *emq_msg_create(const void *data, size_t size);
 emq_msg *emq_msg_copy(emq_msg *msg);
 void *emq_msg_data(emq_msg *msg);
 size_t emq_msg_size(emq_msg *msg);
