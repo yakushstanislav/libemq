@@ -218,7 +218,7 @@ static void emq_queue_list_free_handler(void *value)
 	emq_queue_release(queue);
 }
 
-emq_msg *emq_msg_create(const void *data, size_t size)
+emq_msg *emq_msg_create(void *data, size_t size, int zero_copy)
 {
 	emq_msg *msg;
 
@@ -227,14 +227,19 @@ emq_msg *emq_msg_create(const void *data, size_t size)
 		return NULL;
 	}
 
-	msg->data = malloc(size);
 	msg->size = size;
+	msg->zero_copy = zero_copy;
 
-	if (!msg->data) {
-		return NULL;
+	if (!zero_copy) {
+		msg->data = malloc(size);
+		if (!msg->data) {
+			free(msg);
+			return NULL;
+		}
+		memcpy(msg->data, data, size);
+	} else {
+		msg->data = data;
 	}
-
-	memcpy(msg->data, data, size);
 
 	return msg;
 }
@@ -252,6 +257,7 @@ emq_msg *emq_msg_copy(emq_msg *msg)
 	new_msg->size = msg->size;
 
 	if (!new_msg->data) {
+		free(new_msg);
 		return NULL;
 	}
 
@@ -272,7 +278,10 @@ size_t emq_msg_size(emq_msg *msg)
 
 void emq_msg_release(emq_msg *msg)
 {
-	free(msg->data);
+	if (!msg->zero_copy) {
+		free(msg->data);
+	}
+
 	free(msg);
 }
 

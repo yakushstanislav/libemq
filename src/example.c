@@ -174,7 +174,7 @@ static void queue_management(emq_client *client)
 	}
 
 	/* Create message for push to the queue */
-	msg = emq_msg_create((void*)test_message, strlen(test_message) + 1);
+	msg = emq_msg_create((void*)test_message, strlen(test_message) + 1, EMQ_ZEROCOPY_ON);
 	if (msg == NULL) {
 		printf("[Error] emq_msg_create\n");
 		exit(1);
