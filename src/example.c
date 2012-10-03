@@ -5,11 +5,15 @@
 
 #include "emq.h"
 
+#define GREEN(text) "\033[0;32m" text "\033[0;0m"
+#define RED(text) "\033[0;31m" text "\033[0;0m"
+#define YELLOW(text) "\033[0;33m" text "\033[0;0m"
+
 #define CHECK_STATUS(text, status) \
 	if (status == EMQ_STATUS_OK) \
-		printf("[\033[0;32mSuccess\033[0;0m] %s\n", text); \
+		printf(GREEN("[Success]") " %s\n", text); \
 	else \
-		printf("[\033[0;31mError\033[0;0m] %s\n", text); 
+		printf(RED("[Error]") " %s\n", text);
 
 #define ADDR "localhost"
 #define PORT 7851
@@ -34,7 +38,7 @@ static void basic(emq_client *client)
 	CHECK_STATUS("Stat", status);
 
 	/* Print server statistics */
-	printf("[\033[0;33mStatus\033[0;0m]\n");
+	printf(YELLOW("[Status]\n"));
 	printf("Version\n");
 	printf(" Major: %d\n", stat.version.major);
 	printf(" Minor: %d\n", stat.version.minor);
@@ -75,6 +79,7 @@ static void user_management(emq_client *client)
 
 	/* Request the list of users */
 	users = emq_user_list(client);
+	printf(YELLOW("[User list]\n"));
 	if (users != NULL) {
 		/* Enumeration all users */
 		emq_list_rewind(users, &iter);
@@ -88,7 +93,7 @@ static void user_management(emq_client *client)
 		}
 		emq_list_release(users);
 	} else {
-		printf("[Error] emq_user_list(%s)\n", EMQ_GET_ERROR(client));
+		printf(RED("[Error]") " emq_user_list(%s)\n", EMQ_GET_ERROR(client));
 	}
 
 	/* Rename user with name "user_2" to "user" */
@@ -128,7 +133,7 @@ static void queue_management(emq_client *client)
 	/* Create queue with name ".queue_1" */
 	status = emq_queue_create(client, ".queue_1", EMQ_MAX_MSG, EMQ_MAX_MSG_SIZE, 0);
 	CHECK_STATUS("Queue create", status);
-	
+
 	/* Create queue with name "queue-2" */
 	status = emq_queue_create(client, "queue-2", EMQ_MAX_MSG/2, EMQ_MAX_MSG_SIZE/100, 0);
 	CHECK_STATUS("Queue create", status);
@@ -156,6 +161,7 @@ static void queue_management(emq_client *client)
 
 	/* Request the queue list */
 	queues = emq_queue_list(client);
+	printf(YELLOW("[Queue list]\n"));
 	if (queues != NULL) {
 		/* Enumeration of all queues */
 		emq_list_rewind(queues, &iter);
@@ -170,13 +176,13 @@ static void queue_management(emq_client *client)
 		}
 		emq_list_release(queues);
 	} else {
-		printf("[Error] emq_queue_list(%s)\n", EMQ_GET_ERROR(client));
+		printf(RED("[Error]") " emq_queue_list(%s)\n", EMQ_GET_ERROR(client));
 	}
 
 	/* Create message for push to the queue */
 	msg = emq_msg_create((void*)test_message, strlen(test_message) + 1, EMQ_ZEROCOPY_ON);
 	if (msg == NULL) {
-		printf("[Error] emq_msg_create\n");
+		printf(RED("[Error]") " emq_msg_create\n");
 		exit(1);
 	}
 
@@ -192,14 +198,14 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name ".queue_1" */
 	queue_size = emq_queue_size(client, ".queue_1");
-	printf("[\033[0;33mSuccess\033[0;0m] Queue \".queue_1\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %zu\n", queue_size);
 
 	/* Get all messages from queue ".queue_1" */
 	for (messages = 0; messages < queue_size; messages++) {
 		queue_msg = emq_queue_get(client, ".queue_1");
 		if (queue_msg != NULL)
 		{
-			printf("[\033[0;33mSuccess\033[0;0m] Get message: %s(%zu)\n",
+			printf(YELLOW("[Success]") " Get message: %s(%zu)\n",
 				(char*)emq_msg_data(queue_msg), emq_msg_size(queue_msg));
 			emq_msg_release(queue_msg);
 		}
@@ -207,18 +213,18 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name ".queue_1" again */
 	queue_size = emq_queue_size(client, ".queue_1");
-	printf("[\033[0;33mSuccess\033[0;0m] Queue \".queue_1\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %zu\n", queue_size);
 
 	/* Get size queue with name ".queue-2" */
 	queue_size = emq_queue_size(client, "queue-2");
-	printf("[\033[0;33mSuccess\033[0;0m] Queue \"queue-2\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %zu\n", queue_size);
 
 	/* Pop all messages from queue "queue-2" */
 	for (messages = 0; messages < queue_size; messages++) {
 		queue_msg = emq_queue_pop(client, "queue-2");
 		if (queue_msg != NULL)
 		{
-			printf("[\033[0;33mSuccess\033[0;0m] Pop message: %s(%zu)\n",
+			printf(YELLOW("[Success]") " Pop message: %s(%zu)\n",
 				(char*)emq_msg_data(queue_msg), emq_msg_size(queue_msg));
 			emq_msg_release(queue_msg);
 		}
@@ -226,7 +232,7 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name "queue-2" */
 	queue_size = emq_queue_size(client, "queue-2");
-	printf("[\033[0;33mSuccess\033[0;0m] Queue \"queue-2\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %zu\n", queue_size);
 
 	/* Purge queue with name ".queue_1" */
 	status = emq_queue_purge(client, ".queue_1");
@@ -234,7 +240,7 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name ".queue_1" again */
 	queue_size = emq_queue_size(client, ".queue_1");
-	printf("[\033[0;33mSuccess\033[0;0m] Queue \".queue_1\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %zu\n", queue_size);
 
 	/* Delete queue with name ".queue_1" */
 	status = emq_queue_delete(client, ".queue_1");
@@ -256,7 +262,7 @@ int main(int argc, char *argv[])
 	/* Connected? */
 	if (client != NULL)
 	{
-		printf("Connected to %s:%d\n", ADDR, PORT);
+		printf(YELLOW("[Success]") " Connected to %s:%d\n", ADDR, PORT);
 
 		basic(client);
 		user_management(client);
@@ -265,7 +271,7 @@ int main(int argc, char *argv[])
 		/* Disconnect from server */
 		emq_disconnect(client);
 	} else {
-		printf("Error connect to %s:%d\n", ADDR, PORT);
+		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, PORT);
 	}
 
 	return 0;
