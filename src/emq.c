@@ -514,8 +514,8 @@ emq_list *emq_user_list(emq_client *client)
 		goto error;
 	}
 
-	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_USER_LIST ||
-		(header.status != EMQ_PROTOCOL_SUCCESS_USER_LIST && header.status != EMQ_PROTOCOL_ERROR_USER_LIST)) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_USER_LIST,
+		EMQ_PROTOCOL_SUCCESS_USER_LIST, EMQ_PROTOCOL_ERROR_USER_LIST) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
@@ -832,8 +832,8 @@ emq_list *emq_queue_list(emq_client *client)
 		goto error;
 	}
 
-	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_QUEUE_LIST ||
-		(header.status != EMQ_PROTOCOL_SUCCESS_QUEUE_LIST && header.status != EMQ_PROTOCOL_ERROR_QUEUE_LIST)) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_LIST,
+		EMQ_PROTOCOL_SUCCESS_QUEUE_LIST, EMQ_PROTOCOL_ERROR_QUEUE_LIST) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
@@ -1040,8 +1040,8 @@ emq_msg *emq_queue_get(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_QUEUE_GET ||
-		(header.status != EMQ_PROTOCOL_SUCCESS_QUEUE_GET && header.status != EMQ_PROTOCOL_ERROR_QUEUE_GET)) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_GET,
+		EMQ_PROTOCOL_SUCCESS_QUEUE_GET, EMQ_PROTOCOL_ERROR_QUEUE_GET) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
@@ -1084,8 +1084,8 @@ emq_msg *emq_queue_pop(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if (header.magic != EMQ_PROTOCOL_RES || header.cmd != EMQ_PROTOCOL_CMD_QUEUE_POP ||
-		(header.status != EMQ_PROTOCOL_SUCCESS_QUEUE_POP && header.status != EMQ_PROTOCOL_ERROR_QUEUE_POP)) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_POP,
+		EMQ_PROTOCOL_SUCCESS_QUEUE_POP, EMQ_PROTOCOL_ERROR_QUEUE_POP) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}

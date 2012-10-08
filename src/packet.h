@@ -36,6 +36,9 @@
 int emq_check_response_header(protocol_response_header *header, uint8_t cmd,
 	uint8_t status_success, uint8_t status_error, uint32_t bodylen);
 
+int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd,
+	uint8_t status_success, uint8_t status_error);
+
 int emq_check_status(protocol_response_header *header, uint8_t status);
 
 int emq_auth_request(emq_client *client, const char *name, const char *password);

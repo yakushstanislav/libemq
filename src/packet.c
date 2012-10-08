@@ -78,13 +78,20 @@ int emq_check_response_header(protocol_response_header *header, uint8_t cmd,
 	return EMQ_STATUS_OK;
 }
 
-int emq_check_status(protocol_response_header *header, uint8_t status)
+int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd,
+	uint8_t status_success, uint8_t status_error)
 {
-	if (header->status == status) {
-		return EMQ_STATUS_OK;
-	} else {
+	if (header->magic != EMQ_PROTOCOL_RES || header->cmd != cmd ||
+		(header->status != status_success && header->status != status_error)) {
 		return EMQ_STATUS_ERR;
 	}
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_check_status(protocol_response_header *header, uint8_t status)
+{
+	return header->status == status ? EMQ_STATUS_OK : EMQ_STATUS_ERR;
 }
 
 int emq_auth_request(emq_client *client, const char *name, const char *password)
