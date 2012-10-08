@@ -66,14 +66,25 @@ static int emq_check_realloc_client_request(emq_client *client, size_t size)
 	return EMQ_STATUS_OK;
 }
 
-int emq_check_response_header(protocol_response_header *header, uint8_t cmd, uint8_t status, uint32_t bodylen)
+int emq_check_response_header(protocol_response_header *header, uint8_t cmd,
+	uint8_t status_success, uint8_t status_error, uint32_t bodylen)
 {
 	if (header->magic != EMQ_PROTOCOL_RES || header->cmd != cmd ||
-		header->status != status || header->bodylen != bodylen) {
+		(header->status != status_success && header->status != status_error) ||
+		header->bodylen != bodylen) {
 		return EMQ_STATUS_ERR;
 	}
 
 	return EMQ_STATUS_OK;
+}
+
+int emq_check_status(protocol_response_header *header, uint8_t status)
+{
+	if (header->status == status) {
+		return EMQ_STATUS_OK;
+	} else {
+		return EMQ_STATUS_ERR;
+	}
 }
 
 int emq_auth_request(emq_client *client, const char *name, const char *password)
