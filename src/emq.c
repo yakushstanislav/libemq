@@ -30,6 +30,7 @@
 #include <string.h>
 
 #include "emq.h"
+#include "version.h"
 #include "network.h"
 #include "protocol.h"
 #include "packet.h"
@@ -1182,4 +1183,9 @@ int emq_queue_delete(emq_client *client, const char *name)
 error:
 	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
 	return EMQ_STATUS_ERR;
+}
+
+int emq_version(void)
+{
+	return EMQ_VERSION;
 }

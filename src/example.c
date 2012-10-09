@@ -8,6 +8,7 @@
 #define GREEN(text) "\033[0;32m" text "\033[0;0m"
 #define RED(text) "\033[0;31m" text "\033[0;0m"
 #define YELLOW(text) "\033[0;33m" text "\033[0;0m"
+#define MAGENTA(text) "\033[0;35m" text "\033[0;0m"
 
 #define CHECK_STATUS(text, status) \
 	if (status == EMQ_STATUS_OK) \
@@ -258,6 +259,9 @@ int main(int argc, char *argv[])
 {
 	/* Connect to server */
 	emq_client *client = emq_tcp_connect(ADDR, PORT);
+
+	printf(MAGENTA("This is a simple example of using libemq\n"));
+	printf(MAGENTA("libemq version: %d\n"), emq_version());
 
 	/* Connected? */
 	if (client != NULL)

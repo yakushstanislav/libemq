@@ -188,6 +188,8 @@ emq_msg *emq_queue_pop(emq_client *client, const char *name);
 int emq_queue_purge(emq_client *client, const char *name);
 int emq_queue_delete(emq_client *client, const char *name);
 
+int emq_version(void);
+
 void emq_list_rewind(emq_list *list, emq_list_iterator *iter);
 emq_list_node *emq_list_next(emq_list_iterator *iter);
 void emq_list_release(emq_list *list);
