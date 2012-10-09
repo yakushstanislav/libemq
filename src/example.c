@@ -173,6 +173,7 @@ static void queue_management(emq_client *client)
 			printf("Max msg: %u\n", queue->max_msg);
 			printf("Max msg size: %d\n", queue->max_msg_size);
 			printf("Flags: %d\n", queue->flags);
+			printf("Size: %d\n", queue->size);
 			printf("-----------------------\n");
 		}
 		emq_list_release(queues);

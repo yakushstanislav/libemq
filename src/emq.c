@@ -882,6 +882,8 @@ emq_list *emq_queue_list(emq_client *client)
 		i += sizeof(uint32_t);
 		memcpy(&queue->flags, buffer + i, sizeof(uint32_t));
 		i += sizeof(uint32_t);
+		memcpy(&queue->size, buffer + i, sizeof(uint32_t));
+		i += sizeof(uint32_t);
 
 		emq_list_add_value(list, queue);
 	}
