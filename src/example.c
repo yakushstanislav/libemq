@@ -60,7 +60,7 @@ static void basic(emq_client *client)
 /* Example user management */
 static void user_management(emq_client *client)
 {
-	emq_user_perm perm = 0; /* variable for contain user permissions */
+	emq_perm perm = 0; /* variable for contain user permissions */
 	emq_list *users; /* users */
 	emq_user *user; /* user */
 	emq_list_iterator iter; /* iterator */

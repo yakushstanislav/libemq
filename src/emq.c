@@ -451,7 +451,7 @@ error:
 	return EMQ_STATUS_ERR;
 }
 
-int emq_user_create(emq_client *client, const char *name, const char *password, uint64_t perm)
+int emq_user_create(emq_client *client, const char *name, const char *password, emq_perm perm)
 {
 	protocol_response_header header;
 
@@ -613,7 +613,7 @@ error:
 	return EMQ_STATUS_ERR;
 }
 
-int emq_user_set_perm(emq_client *client, const char *name, uint64_t perm)
+int emq_user_set_perm(emq_client *client, const char *name, emq_perm perm)
 {
 	protocol_response_header header;
 

@@ -83,7 +83,7 @@
 #define EMQ_ZEROCOPY_ON 1
 #define EMQ_ZEROCOPY_OFF 0
 
-typedef uint64_t emq_user_perm;
+typedef uint64_t emq_perm;
 
 typedef struct emq_client {
 	int status;
@@ -97,7 +97,7 @@ typedef struct emq_client {
 typedef struct emq_user {
 	char name[32];
 	char password[32];
-	uint64_t perm;
+	emq_perm perm;
 } emq_user;
 
 typedef struct emq_queue {
@@ -171,10 +171,10 @@ int emq_auth(emq_client *client, const char *name, const char *password);
 int emq_ping(emq_client *client);
 int emq_stat(emq_client *client, emq_status *status);
 
-int emq_user_create(emq_client *client, const char *name, const char *password, uint64_t perm);
+int emq_user_create(emq_client *client, const char *name, const char *password, emq_perm perm);
 emq_list *emq_user_list(emq_client *client);
 int emq_user_rename(emq_client *client, const char *from, const char *to);
-int emq_user_set_perm(emq_client *client, const char *name, uint64_t perm);
+int emq_user_set_perm(emq_client *client, const char *name, emq_perm perm);
 int emq_user_delete(emq_client *client, const char *name);
 
 int emq_queue_create(emq_client *client, const char *name, uint32_t max_msg, uint32_t max_msg_size, uint32_t flags);
