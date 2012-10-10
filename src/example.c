@@ -60,22 +60,18 @@ static void basic(emq_client *client)
 /* Example user management */
 static void user_management(emq_client *client)
 {
-	emq_perm perm = 0; /* variable for contain user permissions */
 	emq_list *users; /* users */
 	emq_user *user; /* user */
 	emq_list_iterator iter; /* iterator */
 	emq_list_node *node; /* list node */
 	int status;
 
-	/* Create permissions for the new users */
-	EMQ_SET_PERM(perm, EMQ_QUEUE_PERM_BIT); /* User can manage queues */
-
 	/* Create new user with name "first.user" and password "password" */
-	status = emq_user_create(client, "first.user", "password", perm);
+	status = emq_user_create(client, "first.user", "password", EMQ_QUEUE_PERM);
 	CHECK_STATUS("User create", status);
 
 	/* Create new user with name "user_2" and password "password" */
-	status = emq_user_create(client, "user_2", "password", perm);
+	status = emq_user_create(client, "user_2", "password", EMQ_QUEUE_PERM);
 	CHECK_STATUS("User create", status);
 
 	/* Request the list of users */
@@ -101,11 +97,8 @@ static void user_management(emq_client *client)
 	status = emq_user_rename(client, "user_2", "user");
 	CHECK_STATUS("User rename", status);
 
-	/* Update permissions */
-	EMQ_SET_PERM(perm, EMQ_ADMIN_PERM_BIT); /* User is administrator */
-
 	/* Setting the new permissions */
-	status = emq_user_set_perm(client, "user", perm);
+	status = emq_user_set_perm(client, "user", EMQ_QUEUE_PERM | EMQ_ADMIN_PERM);
 	CHECK_STATUS("User set perm", status);
 
 	/* Delete user with name "first.user" */
