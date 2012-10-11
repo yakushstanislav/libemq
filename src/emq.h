@@ -106,6 +106,8 @@ typedef struct emq_queue {
 	uint32_t max_msg_size;
 	uint32_t flags;
 	uint32_t size;
+	uint32_t declared_clients;
+	uint32_t subscribed_clients;
 } emq_queue;
 
 typedef struct emq_list_node {
