@@ -6,7 +6,7 @@ LIBEMQ_MAJOR=0
 LIBEMQ_MINOR=0
 
 CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
-OPTIMIZATION?=-O3
+OPTIMIZATION?=-O2
 WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
 DEBUG?= -g -ggdb
 COMPILE_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG)
