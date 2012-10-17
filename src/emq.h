@@ -147,8 +147,6 @@ typedef struct emq_status {
 	uint32_t used_memory;
 	uint32_t used_memory_rss;
 	float fragmentation_ratio;
-	uint32_t rx;
-	uint32_t tx;
 	uint32_t clients;
 	uint32_t users;
 	uint32_t queues;

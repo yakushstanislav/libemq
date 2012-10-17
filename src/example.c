@@ -49,9 +49,7 @@ static void basic(emq_client *client)
 	printf("CPU user: %f\n", stat.used_cpu_user);
 	printf("Memory: %d\n", stat.used_memory);
 	printf("Memory RSS: %d\n", stat.used_memory_rss);
-	printf("Fragmentation: %f\n", stat.fragmentation_ratio);
-	printf("RX: %d\n", stat.rx);
-	printf("TX: %d\n", stat.tx);
+	printf("Memory fragmentation: %f\n", stat.fragmentation_ratio);
 	printf("Clients: %d\n", stat.clients);
 	printf("Users: %d\n", stat.users);
 	printf("Queues: %d\n", stat.queues);
