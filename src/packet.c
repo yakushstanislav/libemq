@@ -34,6 +34,8 @@
 #include "packet.h"
 #include "protocol.h"
 
+#define strlenz(str) (strlen(str) + 1)
+
 static void emq_set_header_request(protocol_request_header *header, uint8_t cmd, uint32_t bodylen)
 {
 	header->magic = EMQ_PROTOCOL_REQ;
@@ -98,7 +100,7 @@ int emq_auth_request(emq_client *client, const char *name, const char *password)
 {
 	protocol_request_auth req;
 
-	if (strlen(name) > 32 || strlen(password) > 32) {
+	if (strlenz(name) > 32 || strlenz(password) > 32) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -106,8 +108,8 @@ int emq_auth_request(emq_client *client, const char *name, const char *password)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_AUTH, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
-	memcpy(req.body.password, password, strlen(password));
+	memcpy(req.body.name, name, strlenz(name));
+	memcpy(req.body.password, password, strlenz(password));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -156,7 +158,7 @@ int emq_user_create_request(emq_client *client, const char *name, const char *pa
 {
 	protocol_request_user_create req;
 
-	if (strlen(name) > 32 || strlen(password) > 32) {
+	if (strlenz(name) > 32 || strlenz(password) > 32) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -164,8 +166,8 @@ int emq_user_create_request(emq_client *client, const char *name, const char *pa
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_CREATE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
-	memcpy(req.body.password, password, strlen(password));
+	memcpy(req.body.name, name, strlenz(name));
+	memcpy(req.body.password, password, strlenz(password));
 	req.body.perm = perm;
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
@@ -198,7 +200,7 @@ int emq_user_rename_request(emq_client *client, const char *from, const char *to
 {
 	protocol_request_user_rename req;
 
-	if (strlen(from) > 32 || strlen(to) > 32) {
+	if (strlenz(from) > 32 || strlenz(to) > 32) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -206,8 +208,8 @@ int emq_user_rename_request(emq_client *client, const char *from, const char *to
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_RENAME, sizeof(req.body));
 
-	memcpy(req.body.from, from, strlen(from));
-	memcpy(req.body.to, to, strlen(to));
+	memcpy(req.body.from, from, strlenz(from));
+	memcpy(req.body.to, to, strlenz(to));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -222,7 +224,7 @@ int emq_user_set_perm_request(emq_client *client, const char *name, uint64_t per
 {
 	protocol_request_user_set_perm req;
 
-	if (strlen(name) > 32) {
+	if (strlenz(name) > 32) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -230,7 +232,7 @@ int emq_user_set_perm_request(emq_client *client, const char *name, uint64_t per
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_SET_PERM, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 	req.body.perm = perm;
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
@@ -246,7 +248,7 @@ int emq_user_delete_request(emq_client *client, const char *name)
 {
 	protocol_request_user_delete req;
 
-	if (strlen(name) > 32) {
+	if (strlenz(name) > 32) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -254,7 +256,7 @@ int emq_user_delete_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_DELETE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -269,7 +271,7 @@ int emq_queue_create_request(emq_client *client, const char *name, uint32_t max_
 {
 	protocol_request_queue_create req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -277,7 +279,7 @@ int emq_queue_create_request(emq_client *client, const char *name, uint32_t max_
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_CREATE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 	req.body.max_msg = max_msg;
 	req.body.max_msg_size = max_msg_size;
 	req.body.flags = flags;
@@ -295,7 +297,7 @@ int emq_queue_declare_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_declare req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -303,7 +305,7 @@ int emq_queue_declare_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_DECLARE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -318,7 +320,7 @@ int emq_queue_exist_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_exist req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -326,7 +328,7 @@ int emq_queue_exist_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_EXIST, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -358,7 +360,7 @@ int emq_queue_size_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_size req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -366,7 +368,7 @@ int emq_queue_size_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_SIZE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -381,7 +383,7 @@ int emq_queue_push_request(emq_client *client, const char *name, uint32_t msg_si
 {
 	protocol_request_queue_push req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -389,7 +391,7 @@ int emq_queue_push_request(emq_client *client, const char *name, uint32_t msg_si
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_PUSH, 64 + msg_size);
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -404,7 +406,7 @@ int emq_queue_get_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_get req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -412,7 +414,7 @@ int emq_queue_get_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_GET, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -427,7 +429,7 @@ int emq_queue_pop_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_pop req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -435,7 +437,7 @@ int emq_queue_pop_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_POP, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -450,7 +452,7 @@ int emq_queue_purge_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_purge req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -458,7 +460,7 @@ int emq_queue_purge_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_PURGE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -473,7 +475,7 @@ int emq_queue_delete_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_delete req;
 
-	if (strlen(name) > 64) {
+	if (strlenz(name) > 64) {
 		return EMQ_STATUS_ERR;
 	}
 
@@ -481,7 +483,7 @@ int emq_queue_delete_request(emq_client *client, const char *name)
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_DELETE, sizeof(req.body));
 
-	memcpy(req.body.name, name, strlen(name));
+	memcpy(req.body.name, name, strlenz(name));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
