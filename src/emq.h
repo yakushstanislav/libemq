@@ -31,8 +31,10 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define EMQ_MAJOR 0
-#define EMQ_MINOR 0
+#define EMQ_VERSION_MAJOR 0
+#define EMQ_VERSION_MINOR 0 /* 0..9 */
+
+#define EMQ_VERSION(major, minor) (major * 10 + minor)
 
 #define EMQ_STATUS_OK 0
 #define EMQ_STATUS_ERR -1

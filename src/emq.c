@@ -30,7 +30,6 @@
 #include <string.h>
 
 #include "emq.h"
-#include "version.h"
 #include "network.h"
 #include "protocol.h"
 #include "packet.h"
@@ -1193,5 +1192,5 @@ error:
 
 int emq_version(void)
 {
-	return EMQ_VERSION;
+	return EMQ_VERSION(EMQ_VERSION_MAJOR, EMQ_VERSION_MINOR);
 }

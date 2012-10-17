@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
 	emq_client *client = emq_tcp_connect(ADDR, PORT);
 
 	printf(MAGENTA("This is a simple example of using libemq\n"));
-	printf(MAGENTA("libemq version: %d\n"), emq_version());
+	printf(MAGENTA("libemq version: %d.%d\n"), EMQ_VERSION_MAJOR, EMQ_VERSION_MINOR);
 
 	/* Connected? */
 	if (client != NULL)
