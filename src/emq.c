@@ -39,11 +39,11 @@
 
 static const char *emq_error_array[] = {
 	"",
-	"Error allocate memory\n",
-	"Error input data\n",
-	"Error write request\n",
-	"Error read request\n",
-	"Error response\n"
+	"Error allocate memory",
+	"Error input data",
+	"Error write request",
+	"Error read request",
+	"Error response"
 };
 
 static emq_client *emq_client_init(void)
@@ -1188,6 +1188,11 @@ int emq_queue_delete(emq_client *client, const char *name)
 error:
 	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
 	return EMQ_STATUS_ERR;
+}
+
+char *emq_last_error(emq_client *client)
+{
+	return EMQ_GET_ERROR(client);
 }
 
 int emq_version(void)
