@@ -205,7 +205,7 @@ static void destroy_threads(void)
 static void init_message(void)
 {
 	int i;
-	message_data = (char*)malloc(config.msg_size);
+	message_data = (char*)malloc(config.msg_size + 1);
 
 	if (!message_data) {
 		printf("Error allocate memory\n");
