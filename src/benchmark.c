@@ -223,7 +223,9 @@ static void destroy_message(void)
 static void print_statistics(long long start, long long end)
 {
 	long long ms = end - start;
-	float sec = (end - start)/1000.0;
+	float sec = (end - start) / 1000.0;
+	int total_bytes = config.messages * config.msg_size;
+	float total_megabytes = (float)total_bytes * 1.0 * 0.000001;
 
 	printf("===== Information =====\n");
 	printf("Clients: %d\n", config.clients);
@@ -232,6 +234,7 @@ static void print_statistics(long long start, long long end)
 	printf("===== Results =====\n");
 	printf("%d requests completed in %lld miliseconds(%.2f seconds)\n", config.messages, ms, sec);
 	printf("%.2f requests per second\n", config.messages/sec);
+	printf("%d bytes(%.2f MB) sent in the queue\n", total_bytes, total_megabytes);
 }
 
 static int init_config(void)
