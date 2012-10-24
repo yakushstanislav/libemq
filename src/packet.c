@@ -91,6 +91,16 @@ int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd
 	return EMQ_STATUS_OK;
 }
 
+int emq_check_event_header(protocol_event_header *header, uint8_t cmd, uint8_t type1, uint8_t type2)
+{
+	if (header->magic != EMQ_PROTOCOL_EVENT || header->cmd != cmd ||
+		(header->type != type1 && header->type != type2)) {
+		return EMQ_STATUS_ERR;
+	}
+
+	return EMQ_STATUS_OK;
+}
+
 int emq_check_status(protocol_response_header *header, uint8_t status)
 {
 	return header->status == status ? EMQ_STATUS_OK : EMQ_STATUS_ERR;
@@ -436,6 +446,53 @@ int emq_queue_pop_request(emq_client *client, const char *name)
 	memset(&req, 0, sizeof(req));
 
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_POP, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_queue_subscribe_request(emq_client *client, const char *name, uint32_t flags)
+{
+	protocol_request_queue_subscribe req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+	req.body.flags = flags;
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_queue_unsubscribe_request(emq_client *client, const char *name)
+{
+	protocol_request_queue_unsubscribe req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 

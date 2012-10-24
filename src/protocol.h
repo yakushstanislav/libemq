@@ -32,7 +32,8 @@
 
 typedef enum protocol_binary_magic {
 	EMQ_PROTOCOL_REQ = 0x70,
-	EMQ_PROTOCOL_RES = 0x80
+	EMQ_PROTOCOL_RES = 0x80,
+	EMQ_PROTOCOL_EVENT = 0x90
 } protocol_binary_magic;
 
 typedef enum protocol_command {
@@ -112,6 +113,11 @@ typedef enum protocol_response_status {
 	EMQ_PROTOCOL_ERROR_QUEUE_DELETE = 0x71
 } protocol_response_status;
 
+typedef enum protocol_event_type {
+	EMQ_PROTOCOL_EVENT_NOTIFY = 0x1,
+	EMQ_PROTOCOL_EVENT_MESSAGE = 0x2
+} protocol_event_type;
+
 #pragma pack(push, 1)
 
 typedef struct protocol_request_header {
@@ -127,6 +133,13 @@ typedef struct protocol_response_header {
 	uint8_t status;
 	uint32_t bodylen;
 } protocol_response_header;
+
+typedef struct protocol_event_header {
+	uint16_t magic;
+	uint8_t cmd;
+	uint8_t type;
+	uint32_t bodylen;
+} protocol_event_header;
 
 typedef struct protocol_request_auth {
 	protocol_request_header header;

@@ -68,6 +68,9 @@
 #define EMQ_QUEUE_AUTODELETE 1
 #define EMQ_QUEUE_FORCE_PUSH 2
 
+#define EMQ_QUEUE_SUBSCRIBE_NONE 0
+#define EMQ_QUEUE_SUBSCRIBE_NOTIFY 1
+
 #define EMQ_MAX_MSG 4294967295
 #define EMQ_MAX_MSG_SIZE 2147483647
 
@@ -84,33 +87,6 @@
 
 #define EMQ_ZEROCOPY_ON 1
 #define EMQ_ZEROCOPY_OFF 0
-
-typedef uint64_t emq_perm;
-
-typedef struct emq_client {
-	int status;
-	char error[EMQ_ERROR_BUF_SIZE];
-	char *request;
-	size_t size;
-	size_t pos;
-	int fd;
-} emq_client;
-
-typedef struct emq_user {
-	char name[32];
-	char password[32];
-	emq_perm perm;
-} emq_user;
-
-typedef struct emq_queue {
-	char name[64];
-	uint32_t max_msg;
-	uint32_t max_msg_size;
-	uint32_t flags;
-	uint32_t size;
-	uint32_t declared_clients;
-	uint32_t subscribed_clients;
-} emq_queue;
 
 typedef struct emq_list_node {
 	struct emq_list_node *prev;
@@ -129,11 +105,41 @@ typedef struct emq_list {
 	void (*free)(void *value);
 } emq_list;
 
+typedef struct emq_client {
+	int status;
+	char error[EMQ_ERROR_BUF_SIZE];
+	char *request;
+	size_t size;
+	size_t pos;
+	int fd;
+	emq_list *subscriptions;
+} emq_client;
+
+typedef uint64_t emq_perm;
+
+typedef struct emq_user {
+	char name[32];
+	char password[32];
+	emq_perm perm;
+} emq_user;
+
+typedef struct emq_queue {
+	char name[64];
+	uint32_t max_msg;
+	uint32_t max_msg_size;
+	uint32_t flags;
+	uint32_t size;
+	uint32_t declared_clients;
+	uint32_t subscribed_clients;
+} emq_queue;
+
 typedef struct emq_msg {
 	void *data;
 	size_t size;
 	int zero_copy;
 } emq_msg;
+
+typedef int emq_msg_callback(emq_client *client, const char *name, emq_msg *msg);
 
 #pragma pack(push, 1)
 
@@ -188,8 +194,12 @@ size_t emq_queue_size(emq_client *client, const char *name);
 int emq_queue_push(emq_client *client, const char *name, emq_msg *msg);
 emq_msg *emq_queue_get(emq_client *client, const char *name);
 emq_msg *emq_queue_pop(emq_client *client, const char *name);
+int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, emq_msg_callback *callback);
+int emq_queue_unsubscribe(emq_client *client, const char *name);
 int emq_queue_purge(emq_client *client, const char *name);
 int emq_queue_delete(emq_client *client, const char *name);
+
+int emq_process(emq_client *client);
 
 char *emq_last_error(emq_client *client);
 int emq_version(void);

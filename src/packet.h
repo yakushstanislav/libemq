@@ -39,6 +39,8 @@ int emq_check_response_header(protocol_response_header *header, uint8_t cmd,
 int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd,
 	uint8_t status_success, uint8_t status_error);
 
+int emq_check_event_header(protocol_event_header *header, uint8_t cmd, uint8_t type1, uint8_t type2);
+
 int emq_check_status(protocol_response_header *header, uint8_t status);
 
 int emq_auth_request(emq_client *client, const char *name, const char *password);
@@ -59,6 +61,8 @@ int emq_queue_size_request(emq_client *client, const char *name);
 int emq_queue_push_request(emq_client *client, const char *name, uint32_t msg_size);
 int emq_queue_get_request(emq_client *client, const char *name);
 int emq_queue_pop_request(emq_client *client, const char *name);
+int emq_queue_subscribe_request(emq_client *client, const char *name, uint32_t flags);
+int emq_queue_unsubscribe_request(emq_client *client, const char *name);
 int emq_queue_purge_request(emq_client *client, const char *name);
 int emq_queue_delete_request(emq_client *client, const char *name);
 
