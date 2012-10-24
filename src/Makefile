@@ -1,5 +1,5 @@
 OBJ=emq.o network.o packet.o
-BINS=example benchmark
+BINS=example example-subscribe benchmark
 LIBNAME=libemq
 
 LIBEMQ_MAJOR=0
@@ -39,6 +39,9 @@ static: $(STATIC_LIB_NAME)
 
 example: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) example.c $(STATIC_LIB_NAME)
+
+example-subscribe: $(STATIC_LIB_NAME)
+	$(CC) -o $@ $(COMPILE_LDFLAGS) example-subscribe.c $(STATIC_LIB_NAME) -lpthread
 
 benchmark: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) benchmark.c $(STATIC_LIB_NAME) -lpthread
