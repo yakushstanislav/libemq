@@ -83,7 +83,7 @@ static void emq_client_release(emq_client *client)
 
 static void emq_client_set_error(emq_client *client, int error)
 {
-	snprintf(client->error, sizeof(client->error), emq_error_array[error]);
+	snprintf(client->error, sizeof(client->error), "%s", emq_error_array[error]);
 }
 
 static emq_list *emq_list_init(void)
