@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 		status = emq_queue_declare(client, ".queue-test");
 		CHECK_STATUS("Queue declare", status);
 
-		status = emq_queue_subscribe(client, ".queue-test", EMQ_QUEUE_SUBSCRIBE_NONE, queue_message_callback);
+		status = emq_queue_subscribe(client, ".queue-test", EMQ_QUEUE_SUBSCRIBE_MSG, queue_message_callback);
 		CHECK_STATUS("Queue subscribe", status);
 
 		init_worker();
