@@ -123,11 +123,11 @@ static void queue_management(emq_client *client)
 	int status;
 
 	/* Create queue with name ".queue_1" */
-	status = emq_queue_create(client, ".queue_1", EMQ_MAX_MSG, EMQ_MAX_MSG_SIZE, 0);
+	status = emq_queue_create(client, ".queue_1", EMQ_MAX_MSG, EMQ_MAX_MSG_SIZE, EMQ_QUEUE_NONE);
 	CHECK_STATUS("Queue create", status);
 
 	/* Create queue with name "queue-2" */
-	status = emq_queue_create(client, "queue-2", EMQ_MAX_MSG/2, EMQ_MAX_MSG_SIZE/100, 0);
+	status = emq_queue_create(client, "queue-2", EMQ_MAX_MSG/2, EMQ_MAX_MSG_SIZE/100, EMQ_QUEUE_NONE);
 	CHECK_STATUS("Queue create", status);
 
 	/* Warning: don't forget declare queue */
