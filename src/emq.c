@@ -965,7 +965,7 @@ error:
 	return NULL;
 }
 
-size_t emq_queue_size(emq_client *client, const char *name)
+int emq_queue_size(emq_client *client, const char *name)
 {
 	protocol_response_queue_size response;
 

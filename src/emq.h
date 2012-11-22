@@ -191,7 +191,7 @@ int emq_queue_create(emq_client *client, const char *name, uint32_t max_msg, uin
 int emq_queue_declare(emq_client *client, const char *name);
 int emq_queue_exist(emq_client *client, const char *name);
 emq_list *emq_queue_list(emq_client *client);
-size_t emq_queue_size(emq_client *client, const char *name);
+int emq_queue_size(emq_client *client, const char *name);
 int emq_queue_push(emq_client *client, const char *name, emq_msg *msg);
 emq_msg *emq_queue_get(emq_client *client, const char *name);
 emq_msg *emq_queue_pop(emq_client *client, const char *name);

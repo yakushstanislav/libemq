@@ -119,7 +119,7 @@ static void queue_management(emq_client *client)
 	emq_msg *msg; /* message for send to the server */
 	emq_msg *queue_msg;
 	int messages;
-	size_t queue_size;
+	int queue_size;
 	int status;
 
 	/* Create queue with name ".queue_1" */
@@ -193,7 +193,7 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name ".queue_1" */
 	queue_size = emq_queue_size(client, ".queue_1");
-	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
 
 	/* Get all messages from queue ".queue_1" */
 	for (messages = 0; messages < queue_size; messages++) {
@@ -208,11 +208,11 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name ".queue_1" again */
 	queue_size = emq_queue_size(client, ".queue_1");
-	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
 
 	/* Get size queue with name ".queue-2" */
 	queue_size = emq_queue_size(client, "queue-2");
-	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %d\n", queue_size);
 
 	/* Pop all messages from queue "queue-2" */
 	for (messages = 0; messages < queue_size; messages++) {
@@ -227,7 +227,7 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name "queue-2" */
 	queue_size = emq_queue_size(client, "queue-2");
-	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %d\n", queue_size);
 
 	/* Purge queue with name ".queue_1" */
 	status = emq_queue_purge(client, ".queue_1");
@@ -235,7 +235,7 @@ static void queue_management(emq_client *client)
 
 	/* Get size queue with name ".queue_1" again */
 	queue_size = emq_queue_size(client, ".queue_1");
-	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %zu\n", queue_size);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
 
 	/* Delete queue with name ".queue_1" */
 	status = emq_queue_delete(client, ".queue_1");
