@@ -17,7 +17,6 @@
 		printf(RED("[Error]") " %s\n", text);
 
 #define ADDR "localhost"
-#define PORT 7851
 
 /* Basic methods */
 static void basic(emq_client *client)
@@ -252,7 +251,7 @@ static void queue_management(emq_client *client)
 int main(int argc, char *argv[])
 {
 	/* Connect to server */
-	emq_client *client = emq_tcp_connect(ADDR, PORT);
+	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);
 
 	printf(MAGENTA("This is a simple example of using libemq\n"));
 	printf(MAGENTA("libemq version: %d.%d\n"), EMQ_VERSION_MAJOR, EMQ_VERSION_MINOR);
@@ -260,7 +259,7 @@ int main(int argc, char *argv[])
 	/* Connected? */
 	if (client != NULL)
 	{
-		printf(YELLOW("[Success]") " Connected to %s:%d\n", ADDR, PORT);
+		printf(YELLOW("[Success]") " Connected to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
 
 		basic(client);
 		user_management(client);
@@ -269,7 +268,7 @@ int main(int argc, char *argv[])
 		/* Disconnect from server */
 		emq_disconnect(client);
 	} else {
-		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, PORT);
+		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
 	}
 
 	return 0;

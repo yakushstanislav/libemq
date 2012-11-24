@@ -17,7 +17,6 @@
 		printf(RED("[Error]") " %s\n", text);
 
 #define ADDR "localhost"
-#define PORT 7851
 
 #define TEST_MESSAGE "Hello EagleMQ"
 #define MESSAGES 10
@@ -28,13 +27,13 @@ pthread_t thread;
 
 void *worker(void *data)
 {
-	emq_client *client = emq_tcp_connect(ADDR, PORT);
+	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);
 	emq_msg *msg = emq_msg_create(TEST_MESSAGE, strlen(TEST_MESSAGE) + 1, EMQ_ZEROCOPY_ON);
 	int status;
 	int i;
 
 	if (client != NULL) {
-		printf(YELLOW("[Success]") " [Worker] Connected to %s:%d\n", ADDR, PORT);
+		printf(YELLOW("[Success]") " [Worker] Connected to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
 
 		status = emq_auth(client, "eagle", "eagle");
 		CHECK_STATUS("[Worker] Auth", status);
@@ -50,7 +49,7 @@ void *worker(void *data)
 
 		emq_disconnect(client);
 	} else {
-		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, PORT);
+		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
 	}
 
 	emq_msg_release(msg);
@@ -85,7 +84,7 @@ void init_worker(void)
 
 int main(int argc, char *argv[])
 {
-	emq_client *client = emq_tcp_connect(ADDR, PORT);
+	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);
 	int status;
 
 	printf(MAGENTA("This is a simple example of using libemq\n"));
@@ -93,7 +92,7 @@ int main(int argc, char *argv[])
 
 	if (client != NULL)
 	{
-		printf(YELLOW("[Success]") " Connected to %s:%d\n", ADDR, PORT);
+		printf(YELLOW("[Success]") " Connected to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
 
 		status = emq_auth(client, "eagle", "eagle");
 		CHECK_STATUS("Auth", status);
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
 
 		emq_disconnect(client);
 	} else {
-		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, PORT);
+		printf(RED("[Error]") " Error connect to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
 	}
 
 	return 0;
