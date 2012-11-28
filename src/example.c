@@ -252,6 +252,7 @@ int main(int argc, char *argv[])
 {
 	/* Connect to server */
 	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);
+	int status;
 
 	printf(MAGENTA("This is a simple example of using libemq\n"));
 	printf(MAGENTA("libemq version: %d.%d\n"), EMQ_VERSION_MAJOR, EMQ_VERSION_MINOR);
@@ -264,6 +265,10 @@ int main(int argc, char *argv[])
 		basic(client);
 		user_management(client);
 		queue_management(client);
+
+		/* Delete all users and queues (you can use EMQ_FLUSH_ALL) */
+		status = emq_flush(client, EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE);
+		CHECK_STATUS("Flush all users and queues", status);
 
 		/* Disconnect from server */
 		emq_disconnect(client);

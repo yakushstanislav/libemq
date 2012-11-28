@@ -67,6 +67,10 @@
 #define EMQ_QUEUE_PURGE_PERM 1048576
 #define EMQ_QUEUE_DELETE_PERM 2097152
 
+#define EMQ_FLUSH_USER 1
+#define EMQ_FLUSH_QUEUE 2
+#define EMQ_FLUSH_ALL (EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE)
+
 #define EMQ_QUEUE_NONE 0
 #define EMQ_QUEUE_AUTODELETE 1
 #define EMQ_QUEUE_FORCE_PUSH 2
@@ -182,6 +186,7 @@ void emq_disconnect(emq_client *client);
 int emq_auth(emq_client *client, const char *name, const char *password);
 int emq_ping(emq_client *client);
 int emq_stat(emq_client *client, emq_status *status);
+int emq_flush(emq_client *client, uint32_t flags);
 
 int emq_user_create(emq_client *client, const char *name, const char *password, emq_perm perm);
 emq_list *emq_user_list(emq_client *client);
