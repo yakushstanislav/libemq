@@ -48,29 +48,6 @@ Connect to the EagleMQ server via unix domain socket.
 
 Return: emq\_client on success, NULL on error.
 
-### int emq\_flush(emq\_client *client, uint32\_t flags);
-Deleting the data on the server.
-
-<table border="1">
-	<tr>
-		<td><b>№</b></td>
-		<td><b>Name</b></td>
-		<td><b>Description</b></td>
-	</tr>
-	<tr>
-		<td>1</td>
-		<td>client</td>
-		<td>the context of a client connection</td>
-	</tr>
-	<tr>
-		<td>2</td>
-		<td>flags</td>
-		<td>flags to delete the data from the server (EMQ_FLUSH_ALL, EMQ_FLUSH_USER, EMQ_FLUSH_QUEUE)</td>
-	</tr>
-</table>
-
-Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
-
 ### void emq\_disconnect(emq\_client *client);
 Disconnects the client from the server and removes the connection context.
 
@@ -355,6 +332,29 @@ Get server statistics.
 		<td>status</td>
 		<td>out</td>
 		<td>the server statistics</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_flush(emq\_client *client, uint32\_t flags);
+Deleting the data on the server.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>flags</td>
+		<td>flags to delete the data from the server (EMQ_FLUSH_ALL, EMQ_FLUSH_USER, EMQ_FLUSH_QUEUE)</td>
 	</tr>
 </table>
 
