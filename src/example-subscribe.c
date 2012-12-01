@@ -61,7 +61,7 @@ int queue_message_callback(emq_client *client, const char *name, emq_msg *msg)
 {
 	int status;
 
-	printf(YELLOW("[Success]") " [Event] Message \'%s in queue %s\n", (char*)emq_msg_data(msg), name);
+	printf(YELLOW("[Success]") " [Event] Message \'%s\' in queue %s\n", (char*)emq_msg_data(msg), name);
 
 	if (++message_counter >= MESSAGES) {
 		status = emq_queue_unsubscribe(client, ".queue-test");
