@@ -71,6 +71,7 @@ int queue_message_callback(emq_client *client, const char *name, emq_msg *msg)
 	}
 
 	emq_msg_release(msg);
+
 	return 0;
 }
 
