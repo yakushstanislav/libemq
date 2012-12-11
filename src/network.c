@@ -147,8 +147,7 @@ int emq_client_read(emq_client *client, char *buf, int count)
 	{
 		nread = read(client->fd, buf, count-totlen);
 
-		if (nread == 0) return totlen;
-		if (nread == -1) return -1;
+		if (nread == -1 || nread == 0) return -1;
 
 		totlen += nread;
 		buf += nread;
