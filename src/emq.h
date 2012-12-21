@@ -119,6 +119,7 @@ typedef struct emq_client {
 	char *request;
 	size_t size;
 	size_t pos;
+	int noack;
 	int fd;
 	emq_list *subscriptions;
 } emq_client;
@@ -207,6 +208,9 @@ int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, em
 int emq_queue_unsubscribe(emq_client *client, const char *name);
 int emq_queue_purge(emq_client *client, const char *name);
 int emq_queue_delete(emq_client *client, const char *name);
+
+void emq_noack_enable(emq_client *client);
+void emq_noack_disable(emq_client *client);
 
 int emq_process(emq_client *client);
 

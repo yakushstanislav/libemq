@@ -36,11 +36,12 @@
 
 #define strlenz(str) (strlen(str) + 1)
 
-static void emq_set_header_request(protocol_request_header *header, uint8_t cmd, uint32_t bodylen)
+static void emq_set_header_request(protocol_request_header *header, uint8_t cmd,
+	uint8_t noack, uint32_t bodylen)
 {
 	header->magic = EMQ_PROTOCOL_REQ;
 	header->cmd = cmd;
-	header->reserved = 0;
+	header->noack = noack;
 	header->bodylen = bodylen;
 }
 
@@ -116,7 +117,7 @@ int emq_auth_request(emq_client *client, const char *name, const char *password)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_AUTH, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_AUTH, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 	memcpy(req.body.password, password, strlenz(password));
@@ -136,7 +137,7 @@ int emq_ping_request(emq_client *client)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_PING, 0);
+	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_PING, client->noack, 0);
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -153,7 +154,7 @@ int emq_stat_request(emq_client *client)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_STAT, 0);
+	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_STAT, client->noack, 0);
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -170,7 +171,7 @@ int emq_flush_request(emq_client *client, uint32_t flags)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_FLUSH, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_FLUSH, client->noack, sizeof(req.body));
 
 	req.body.flags = flags;
 
@@ -193,7 +194,7 @@ int emq_user_create_request(emq_client *client, const char *name, const char *pa
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_CREATE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_CREATE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 	memcpy(req.body.password, password, strlenz(password));
@@ -214,7 +215,7 @@ int emq_user_list_request(emq_client *client)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_USER_LIST, 0);
+	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_USER_LIST, client->noack, 0);
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -235,7 +236,7 @@ int emq_user_rename_request(emq_client *client, const char *from, const char *to
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_RENAME, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_RENAME, client->noack, sizeof(req.body));
 
 	memcpy(req.body.from, from, strlenz(from));
 	memcpy(req.body.to, to, strlenz(to));
@@ -259,7 +260,7 @@ int emq_user_set_perm_request(emq_client *client, const char *name, uint64_t per
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_SET_PERM, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_SET_PERM, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 	req.body.perm = perm;
@@ -283,7 +284,7 @@ int emq_user_delete_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_DELETE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_USER_DELETE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -306,7 +307,7 @@ int emq_queue_create_request(emq_client *client, const char *name, uint32_t max_
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_CREATE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_CREATE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 	req.body.max_msg = max_msg;
@@ -332,7 +333,7 @@ int emq_queue_declare_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_DECLARE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_DECLARE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -355,7 +356,7 @@ int emq_queue_exist_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_EXIST, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_EXIST, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -374,7 +375,7 @@ int emq_queue_list_request(emq_client *client)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_QUEUE_LIST, 0);
+	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_QUEUE_LIST, client->noack, 0);
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
@@ -395,7 +396,7 @@ int emq_queue_size_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_SIZE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_SIZE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -418,7 +419,7 @@ int emq_queue_push_request(emq_client *client, const char *name, uint32_t msg_si
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_PUSH, 64 + msg_size);
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_PUSH, client->noack, 64 + msg_size);
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -441,7 +442,7 @@ int emq_queue_get_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_GET, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_GET, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -464,7 +465,7 @@ int emq_queue_pop_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_POP, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_POP, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -487,7 +488,7 @@ int emq_queue_subscribe_request(emq_client *client, const char *name, uint32_t f
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 	req.body.flags = flags;
@@ -511,7 +512,7 @@ int emq_queue_unsubscribe_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -534,7 +535,7 @@ int emq_queue_purge_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_PURGE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_PURGE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 
@@ -557,7 +558,7 @@ int emq_queue_delete_request(emq_client *client, const char *name)
 
 	memset(&req, 0, sizeof(req));
 
-	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_DELETE, sizeof(req.body));
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_DELETE, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
 

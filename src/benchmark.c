@@ -29,6 +29,7 @@ static struct config {
 	int clients;
 	int messages;
 	int msg_size;
+	int noack;
 } config;
 
 static long long mstime(void)
@@ -37,8 +38,8 @@ static long long mstime(void)
 	long long mst;
 
 	gettimeofday(&tv, NULL);
-	mst = ((long)tv.tv_sec)*1000;
-	mst += tv.tv_usec/1000;
+	mst = ((long)tv.tv_sec) * 1000;
+	mst += tv.tv_usec / 1000;
 
 	return mst;
 }
@@ -69,7 +70,6 @@ static void *worker(void *data)
 	emq_client *client;
 	emq_msg *message;
 	int msg = config.messages / config.clients;
-	int status;
 	int i;
 
 	if (!config.unix_socket) {
@@ -80,6 +80,10 @@ static void *worker(void *data)
 
 	if (client != NULL)
 	{
+		if (config.noack) {
+			emq_noack_enable(client);
+		}
+
 		emq_auth(client, config.user_name, config.user_password);
 
 		emq_queue_declare(client, QUEUE_NAME);
@@ -157,6 +161,7 @@ static void cleanup_server(void)
 
 		status = emq_queue_exist(client, QUEUE_NAME);
 		if (status == EMQ_STATUS_OK) {
+			printf("Delete queue \'%s\' (size: %d)\n", QUEUE_NAME, emq_queue_size(client, QUEUE_NAME));
 			emq_queue_delete(client, QUEUE_NAME);
 		}
 
@@ -247,6 +252,7 @@ static int init_config(void)
 	config.clients = DEFAULT_CLIENTS;
 	config.messages = DEFAULT_MESSAGES;
 	config.msg_size = DEFAULT_MSG_SIZE;
+	config.noack = 0;
 }
 
 static void usage(void)
@@ -257,11 +263,12 @@ static void usage(void)
 			"-h <hostname> - server IP (default: %s)\n"
 			"-p <port> - server port (default: %d)\n"
 			"-u <unix socket> - server socket\n"
-			"-name <name> - user name (default: %s)\n"
-			"-password <password> - user password (default: %s)\n"
+			"--name <name> - user name (default: %s)\n"
+			"--password <password> - user password (default: %s)\n"
 			"-c <clients> - number of parallel connections (default: %d)\n"
 			"-m <messages> - number of messages for all connections (default: %d)\n"
 			"-s <message size> - size of one message (default: %d)\n"
+			"--noack - enable noack mode\n"
 			"-h - show this message and exit\n",
 				DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER_NAME, DEFAULT_USER_PASSWORD,
 				DEFAULT_CLIENTS, DEFAULT_MESSAGES, DEFAULT_MSG_SIZE);
@@ -281,9 +288,9 @@ static void parse_args(int argc, char *argv[])
 			config.port = atoi(argv[i + 1]);
 		} else if (!strcmp(argv[i], "-u") && !last_arg) {
 			config.unix_socket = argv[i + 1];
-		} else if (!strcmp(argv[i], "-name") && !last_arg) {
+		} else if (!strcmp(argv[i], "--name") && !last_arg) {
 			config.user_name = argv[i + 1];
-		} else if (!strcmp(argv[i], "-password") && !last_arg) {
+		} else if (!strcmp(argv[i], "--password") && !last_arg) {
 			config.user_password = argv[i + 1];
 		} else if (!strcmp(argv[i], "-c") && !last_arg) {
 			config.clients = atoi(argv[i + 1]);
@@ -291,6 +298,8 @@ static void parse_args(int argc, char *argv[])
 			config.messages = atoi(argv[i + 1]);
 		} else if (!strcmp(argv[i], "-s") && !last_arg) {
 			config.msg_size = atoi(argv[i + 1]);
+		} else if (!strcmp(argv[i], "--noack")) {
+			config.noack = 1;
 		} else if (!strcmp(argv[i], "-h")) {
 			usage();
 			exit(0);
