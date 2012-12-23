@@ -64,6 +64,42 @@ Disconnects the client from the server and removes the connection context.
 	</tr>
 </table>
 
+### void emq\_noack\_enable(emq\_client *client);
+Enable noack mode.
+
+When enabled, the server does not respond to commands status messages and the result is always EMQ\_STATUS\_OK.
+Using this option is useful for performance.
+Also, it should be used to send commands if you are subscribed to the queue.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+</table>
+
+### void emq\_noack\_disable(emq\_client *client);
+Disable noack mode.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+</table>
+
 ### int emq\_process(emq\_client *client);
 Processing of all server events.
 
