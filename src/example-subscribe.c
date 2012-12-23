@@ -59,13 +59,13 @@ void *worker(void *data)
 
 int queue_message_callback(emq_client *client, const char *name, emq_msg *msg)
 {
-	int status;
-
 	printf(YELLOW("[Success]") " [Event] Message \'%s\' in queue %s\n", (char*)emq_msg_data(msg), name);
 
 	if (++message_counter >= MESSAGES) {
-		status = emq_queue_unsubscribe(client, ".queue-test");
-		CHECK_STATUS("[Event] Queue unsubscribe", status);
+		emq_noack_enable(client);
+		printf(YELLOW("[Success]") " [Event] Queue unsubscribe\n");
+		emq_queue_unsubscribe(client, ".queue-test");
+		emq_noack_disable(client);
 		emq_msg_release(msg);
 		return 1;
 	}
