@@ -1506,7 +1506,8 @@ int emq_process(emq_client *client)
 			}
 		}
 
-		if (subscription->callback(client, subscription->name, msg)) {
+		if (subscription->callback(client, subscription->name, msg) &&
+			client->subscriptions->length == 0) {
 			break;
 		}
 	}

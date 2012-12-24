@@ -12,8 +12,8 @@
 #define DEFAULT_USER_PASSWORD "eagle"
 
 #define DEFAULT_CLIENTS 50
-#define DEFAULT_MESSAGES 10000
-#define DEFAULT_MSG_SIZE 10
+#define DEFAULT_MESSAGES 100000
+#define DEFAULT_MSG_SIZE 1000
 
 #define QUEUE_NAME ".queue-benchmark"
 
@@ -237,9 +237,9 @@ static void print_statistics(long long start, long long end)
 	printf("Total messages: %d\n", config.messages);
 	printf("Message size: %d\n", config.msg_size);
 	printf("===== Results =====\n");
-	printf("%d requests completed in %lld miliseconds(%.2f seconds)\n", config.messages, ms, sec);
+	printf("%d requests completed in %lld miliseconds (%.2f seconds)\n", config.messages, ms, sec);
 	printf("%.2f requests per second\n", config.messages/sec);
-	printf("%d bytes(%.2f MB) sent in the queue\n", total_bytes, total_megabytes);
+	printf("%d bytes (%.2f MB) sent in the queue\n", total_bytes, total_megabytes);
 }
 
 static int init_config(void)
