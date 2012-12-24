@@ -901,7 +901,7 @@ error:
 
 int emq_queue_exist(emq_client *client, const char *name)
 {
-	protocol_response_header header;
+	protocol_response_queue_exist response;
 
 	EMQ_CLEAR_ERROR(client);
 
@@ -915,30 +915,32 @@ int emq_queue_exist(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if (!client->noack)
-	{
-		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
-			emq_client_set_error(client, EMQ_ERROR_READ);
-			goto error;
-		}
+	if (emq_client_read(client, (char*)&response.header, sizeof(response.header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		goto error;
+	}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_EXIST,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST, EMQ_PROTOCOL_ERROR_QUEUE_EXIST, 0) == EMQ_STATUS_ERR) {
-			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
-			goto error;
-		}
+	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_QUEUE_EXIST,
+		EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST, EMQ_PROTOCOL_ERROR_QUEUE_EXIST, sizeof(response.body)) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+		goto error;
+	}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST) == EMQ_STATUS_ERR) {
-			goto error;
-		}
+	if (emq_check_status(&response.header, EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST) == EMQ_STATUS_ERR) {
+		goto error;
+	}
+
+	if (emq_client_read(client, (char*)&response.body, sizeof(response.body)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		goto error;
 	}
 
 	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
-	return EMQ_STATUS_OK;
+	return response.body.status;
 
 error:
 	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
-	return EMQ_STATUS_ERR;
+	return 0;
 }
 
 emq_list *emq_queue_list(emq_client *client)

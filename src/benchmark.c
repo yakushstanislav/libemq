@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -125,7 +126,7 @@ static void setup_server(void)
 		}
 
 		status = emq_queue_exist(client, QUEUE_NAME);
-		if (status == EMQ_STATUS_OK) {
+		if (status) {
 			emq_queue_delete(client, QUEUE_NAME);
 		}
 
@@ -160,7 +161,7 @@ static void cleanup_server(void)
 		status = emq_auth(client, config.user_name, config.user_password);
 
 		status = emq_queue_exist(client, QUEUE_NAME);
-		if (status == EMQ_STATUS_OK) {
+		if (status) {
 			printf("Delete queue \'%s\' (size: %d)\n", QUEUE_NAME, emq_queue_size(client, QUEUE_NAME));
 			emq_queue_delete(client, QUEUE_NAME);
 		}

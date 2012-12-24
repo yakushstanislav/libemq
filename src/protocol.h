@@ -305,6 +305,13 @@ typedef struct protocol_response_stat {
 	} body;
 } protocol_response_stat;
 
+typedef struct protocol_response_queue_exist {
+	protocol_response_header header;
+	struct {
+		uint32_t status;
+	} body;
+} protocol_response_queue_exist;
+
 typedef struct protocol_response_queue_size {
 	protocol_response_header header;
 	struct {

@@ -726,7 +726,7 @@ Check the queue of existence.
 	</tr>
 </table>
 
-Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+Return: Value greater than 0 if the queue exists.
 
 ### emq\_list *emq\_queue\_list(emq\_client *client);
 Get a list of queues.

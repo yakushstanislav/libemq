@@ -140,15 +140,15 @@ static void queue_management(emq_client *client)
 
 	/* Check on exist queue with name ".queue_1" */
 	status = emq_queue_exist(client, ".queue_1");
-	CHECK_STATUS("Queue exist", status);
+	printf(YELLOW("[Success]") " Queue \".queue_1\" exist: %d\n", status);
 
 	/* Check on exist queue with name "queue-2" */
 	status = emq_queue_exist(client, "queue-2");
-	CHECK_STATUS("Queue exist", status);
+	printf(YELLOW("[Success]") " Queue \"queue-2\" exist: %d\n", status);
 
 	/* Check on exist queue with name "not-exist-queue" */
 	status = emq_queue_exist(client, "not-exist-queue");
-	CHECK_STATUS("Queue exist", !status);
+	printf(YELLOW("[Success]") " Queue \"not-exist-queue\" exist: %d\n", status);
 
 	/* Request the queue list */
 	queues = emq_queue_list(client);
