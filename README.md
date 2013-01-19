@@ -676,7 +676,7 @@ Create the queue.
 	<tr>
 		<td>5</td>
 		<td>flags</td>
-		<td>flags to create a queue (EMQ_QUEUE_NONE, EMQ_QUEUE_AUTODELETE, EMQ_QUEUE_FORCE_PUSH, EMQ_QUEUE_ROUND_ROBIN)</td>
+		<td>flags to create a queue (EMQ_QUEUE_NONE, EMQ_QUEUE_AUTODELETE, EMQ_QUEUE_FORCE_PUSH, EMQ_QUEUE_ROUND_ROBIN, EMQ_QUEUE_DURABLE)</td>
 	</tr>
 </table>
 
