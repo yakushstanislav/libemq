@@ -394,6 +394,8 @@ Saving data to disk.
 	</tr>
 </table>
 
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
 ### int emq\_flush(emq\_client *client, uint32\_t flags);
 Deleting the data on the server.
 
