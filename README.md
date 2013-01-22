@@ -373,6 +373,27 @@ Get server statistics.
 
 Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 
+### int emq_save(emq_client *client, uint8_t async);
+Saving data to disk.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>async</td>
+		<td>Saving mode (0 - synchronously save, 1 - asynchronously save)</td>
+	</tr>
+</table>
+
 ### int emq\_flush(emq\_client *client, uint32\_t flags);
 Deleting the data on the server.
 

@@ -41,8 +41,9 @@ typedef enum protocol_command {
 	EMQ_PROTOCOL_CMD_AUTH = 0x1,
 	EMQ_PROTOCOL_CMD_PING = 0x2,
 	EMQ_PROTOCOL_CMD_STAT = 0x3,
-	EMQ_PROTOCOL_CMD_FLUSH = 0x4,
-	EMQ_PROTOCOL_CMD_DISCONNECT = 0x5,
+	EMQ_PROTOCOL_CMD_SAVE = 0x4,
+	EMQ_PROTOCOL_CMD_FLUSH = 0x5,
+	EMQ_PROTOCOL_CMD_DISCONNECT = 0x6,
 
 	/* user control commands */
 	EMQ_PROTOCOL_CMD_USER_CREATE = 0x10,
@@ -71,7 +72,8 @@ typedef enum protocol_response_status {
 	EMQ_PROTOCOL_SUCCESS_AUTH = 0x2,
 	EMQ_PROTOCOL_SUCCESS_PING = 0x3,
 	EMQ_PROTOCOL_SUCCESS_STAT = 0x4,
-	EMQ_PROTOCOL_SUCCESS_FLUSH = 0x5,
+	EMQ_PROTOCOL_SUCCESS_SAVE = 0x5,
+	EMQ_PROTOCOL_SUCCESS_FLUSH = 0x6,
 	EMQ_PROTOCOL_SUCCESS_USER_CREATE = 0x10,
 	EMQ_PROTOCOL_SUCCESS_USER_LIST = 0x11,
 	EMQ_PROTOCOL_SUCCESS_USER_RENAME = 0x12,
@@ -96,7 +98,8 @@ typedef enum protocol_response_status {
 	EMQ_PROTOCOL_ERROR_AUTH = 0x44,
 	EMQ_PROTOCOL_ERROR_PING = 0x45,
 	EMQ_PROTOCOL_ERROR_STAT = 0x46,
-	EMQ_PROTOCOL_ERROR_FLUSH = 0x47,
+	EMQ_PROTOCOL_ERROR_SAVE = 0x47,
+	EMQ_PROTOCOL_ERROR_FLUSH = 0x48,
 	EMQ_PROTOCOL_ERROR_USER_CREATE = 0x50,
 	EMQ_PROTOCOL_ERROR_USER_LIST = 0x51,
 	EMQ_PROTOCOL_ERROR_USER_RENAME = 0x52,
@@ -154,6 +157,13 @@ typedef struct protocol_request_auth {
 
 typedef protocol_request_header protocol_request_ping;
 typedef protocol_request_header protocol_request_stat;
+
+typedef struct protocol_request_save {
+	protocol_request_header header;
+	struct {
+		uint8_t async;
+	} body;
+} protocol_request_save;
 
 typedef struct protocol_request_flush {
 	protocol_request_header header;

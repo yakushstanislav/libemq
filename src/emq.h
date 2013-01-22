@@ -189,6 +189,7 @@ void emq_disconnect(emq_client *client);
 int emq_auth(emq_client *client, const char *name, const char *password);
 int emq_ping(emq_client *client);
 int emq_stat(emq_client *client, emq_status *status);
+int emq_save(emq_client *client, uint8_t async);
 int emq_flush(emq_client *client, uint32_t flags);
 
 int emq_user_create(emq_client *client, const char *name, const char *password, emq_perm perm);

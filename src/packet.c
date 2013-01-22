@@ -165,6 +165,25 @@ int emq_stat_request(emq_client *client)
 	return EMQ_STATUS_OK;
 }
 
+int emq_save_request(emq_client *client, uint8_t async)
+{
+	protocol_request_save req;
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_SAVE, client->noack, sizeof(req.body));
+
+	req.body.async = async;
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
 int emq_flush_request(emq_client *client, uint32_t flags)
 {
 	protocol_request_flush req;

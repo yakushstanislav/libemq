@@ -521,6 +521,48 @@ error:
 	return EMQ_STATUS_ERR;
 }
 
+int emq_save(emq_client *client, uint8_t async)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_save_request(client, async) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_SAVE,
+			EMQ_PROTOCOL_SUCCESS_SAVE, EMQ_PROTOCOL_ERROR_SAVE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_SAVE) == EMQ_STATUS_ERR) {
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
 int emq_flush(emq_client *client, uint32_t flags)
 {
 	protocol_response_header header;

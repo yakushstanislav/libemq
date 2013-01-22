@@ -46,6 +46,7 @@ int emq_check_status(protocol_response_header *header, uint8_t status);
 int emq_auth_request(emq_client *client, const char *name, const char *password);
 int emq_ping_request(emq_client *client);
 int emq_stat_request(emq_client *client);
+int emq_save_request(emq_client *client, uint8_t async);
 int emq_flush_request(emq_client *client, uint32_t flags);
 
 int emq_user_create_request(emq_client *client, const char *name, const char *password, uint64_t perm);
