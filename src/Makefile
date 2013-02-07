@@ -1,16 +1,16 @@
-OBJ=emq.o network.o packet.o
-BINS=example example-subscribe benchmark
 LIBNAME=libemq
-
 LIBEMQ_MAJOR=0
 LIBEMQ_MINOR=0
 
-CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
+CC:=gcc
 OPTIMIZATION?=-O2
 WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
-DEBUG?= -g -ggdb
+DEBUG?=-g -ggdb
 COMPILE_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG)
 COMPILE_LDFLAGS=$(LDFLAGS)
+
+OBJ=emq.o network.o packet.o
+BINS=example example-subscribe benchmark
 
 DYNAMIC_LIB_SUFFIX=so
 STATIC_LIB_SUFFIX=a
@@ -24,7 +24,10 @@ STATIC_LIB_MAKE_CMD=ar rcs $(STATIC_LIB_NAME)
 all: $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) $(BINS)
 
 # make dep
+benchmark.o: benchmark.c emq.h
 emq.o: emq.c emq.h network.h protocol.h packet.h
+example-subscribe.o: example-subscribe.c emq.h
+example.o: example.c emq.h
 network.o: network.c fmacros.h emq.h network.h
 packet.o: packet.c emq.h packet.h protocol.h
 
