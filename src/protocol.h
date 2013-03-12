@@ -64,7 +64,17 @@ typedef enum protocol_command {
 	EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE = 0x2B,
 	EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE = 0x2C,
 	EMQ_PROTOCOL_CMD_QUEUE_PURGE = 0x2D,
-	EMQ_PROTOCOL_CMD_QUEUE_DELETE = 0x2E
+	EMQ_PROTOCOL_CMD_QUEUE_DELETE = 0x2E,
+
+	/* route commands (47..54) */
+	EMQ_PROTOCOL_CMD_ROUTE_CREATE = 0x2F,
+	EMQ_PROTOCOL_CMD_ROUTE_EXIST = 0x30,
+	EMQ_PROTOCOL_CMD_ROUTE_LIST = 0x31,
+	EMQ_PROTOCOL_CMD_ROUTE_KEYS = 0x32,
+	EMQ_PROTOCOL_CMD_ROUTE_BIND = 0x33,
+	EMQ_PROTOCOL_CMD_ROUTE_UNBIND = 0x34,
+	EMQ_PROTOCOL_CMD_ROUTE_PUSH = 0x35,
+	EMQ_PROTOCOL_CMD_ROUTE_DELETE = 0x36
 } protocol_command;
 
 typedef enum protocol_response_status {
@@ -91,6 +101,14 @@ typedef enum protocol_response_status {
 	EMQ_PROTOCOL_SUCCESS_QUEUE_UNSUBSCRIBE = 0x2C,
 	EMQ_PROTOCOL_SUCCESS_QUEUE_PURGE = 0x2D,
 	EMQ_PROTOCOL_SUCCESS_QUEUE_DELETE = 0x2E,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_CREATE = 0x2F,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_EXIST = 0x30,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_LIST = 0x31,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_KEYS = 0x32,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_BIND = 0x33,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_UNBIND = 0x34,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_PUSH = 0x35,
+	EMQ_PROTOCOL_SUCCESS_ROUTE_DELETE = 0x36,
 	EMQ_PROTOCOL_ERROR = 0x2,
 	EMQ_PROTOCOL_ERROR_PACKET = 0x3,
 	EMQ_PROTOCOL_ERROR_COMMAND = 0x4,
@@ -116,7 +134,15 @@ typedef enum protocol_response_status {
 	EMQ_PROTOCOL_ERROR_QUEUE_SUBSCRIBE = 0xA6,
 	EMQ_PROTOCOL_ERROR_QUEUE_UNSUBSCRIBE = 0xA7,
 	EMQ_PROTOCOL_ERROR_QUEUE_PURGE = 0xA8,
-	EMQ_PROTOCOL_ERROR_QUEUE_DELETE = 0xA9
+	EMQ_PROTOCOL_ERROR_QUEUE_DELETE = 0xA9,
+	EMQ_PROTOCOL_ERROR_ROUTE_CREATE = 0xAA,
+	EMQ_PROTOCOL_ERROR_ROUTE_EXIST = 0xAB,
+	EMQ_PROTOCOL_ERROR_ROUTE_LIST = 0xAC,
+	EMQ_PROTOCOL_ERROR_ROUTE_KEYS = 0xAD,
+	EMQ_PROTOCOL_ERROR_ROUTE_BIND = 0xAE,
+	EMQ_PROTOCOL_ERROR_ROUTE_UNBIND = 0xAF,
+	EMQ_PROTOCOL_ERROR_ROUTE_PUSH = 0xB0,
+	EMQ_PROTOCOL_ERROR_ROUTE_DELETE = 0xB1
 } protocol_response_status;
 
 typedef enum protocol_event_type {
@@ -291,6 +317,63 @@ typedef struct protocol_request_queue_delete {
 	} body;
 } protocol_request_queue_delete;
 
+typedef struct protocol_request_route_create {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		uint32_t flags;
+	} body;
+} protocol_request_route_create;
+
+typedef struct protocol_request_route_exist {
+	protocol_request_header header;
+	struct {
+		char name[64];
+	} body;
+} protocol_request_route_exist;
+
+typedef struct protocol_request_header protocol_request_route_list;
+
+typedef struct protocol_request_route_keys {
+	protocol_request_header header;
+	struct {
+		char name[64];
+	} body;
+} protocol_request_route_keys;
+
+typedef struct protocol_request_route_bind {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char queue[64];
+		char key[32];
+	} body;
+} protocol_request_route_bind;
+
+typedef struct protocol_request_route_unbind {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char queue[64];
+		char key[32];
+	} body;
+} protocol_request_route_unbind;
+
+typedef struct protocol_request_route_push {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char key[32];
+	} body;
+} protocol_request_route_push;
+
+typedef struct protocol_request_route_delete {
+	protocol_request_header header;
+	struct {
+		char name[64];
+	} body;
+} protocol_request_route_delete;
+
 typedef struct protocol_response_stat {
 	protocol_response_header header;
 	struct {
@@ -328,6 +411,13 @@ typedef struct protocol_response_queue_size {
 		uint32_t size;
 	} body;
 } protocol_response_queue_size;
+
+typedef struct protocol_response_route_exist {
+	protocol_response_header header;
+	struct {
+		uint32_t status;
+	} body;
+} protocol_response_route_exist;
 
 #pragma pack(pop)
 

@@ -589,3 +589,187 @@ int emq_queue_delete_request(emq_client *client, const char *name)
 
 	return EMQ_STATUS_OK;
 }
+
+int emq_route_create_request(emq_client *client, const char *name, uint32_t flags)
+{
+	protocol_request_route_create req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_CREATE, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+	req.body.flags = flags;
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_exist_request(emq_client *client, const char *name)
+{
+	protocol_request_route_exist req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_EXIST, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_list_request(emq_client *client)
+{
+	protocol_request_route_list req;
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req, EMQ_PROTOCOL_CMD_ROUTE_LIST, client->noack, 0);
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_keys_request(emq_client *client, const char *name)
+{
+	protocol_request_route_keys req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_KEYS, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_bind_request(emq_client *client, const char *name, const char *queue, const char *key)
+{
+	protocol_request_route_bind req;
+
+	if (strlenz(name) > 64 || strlenz(queue) > 64 || strlenz(key) > 32) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_BIND, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+	memcpy(req.body.queue, queue, strlenz(queue));
+	memcpy(req.body.key, key, strlenz(key));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_unbind_request(emq_client *client, const char *name, const char *queue, const char *key)
+{
+	protocol_request_route_unbind req;
+
+	if (strlenz(name) > 64 || strlenz(queue) > 64 || strlenz(key) > 32) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_UNBIND, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+	memcpy(req.body.queue, queue, strlenz(queue));
+	memcpy(req.body.key, key, strlenz(key));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_push_request(emq_client *client, const char *name, const char *key, uint32_t msg_size)
+{
+	protocol_request_route_push req;
+
+	if (strlenz(name) > 64 || strlenz(key) > 32) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_PUSH, client->noack, 96 + msg_size);
+
+	memcpy(req.body.name, name, strlenz(name));
+	memcpy(req.body.key, key, strlenz(key));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_delete_request(emq_client *client, const char *name)
+{
+	protocol_request_route_delete req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_DELETE, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}

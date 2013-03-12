@@ -67,9 +67,19 @@
 #define EMQ_QUEUE_PURGE_PERM 1073741824
 #define EMQ_QUEUE_DELETE_PERM 2147483648
 
+#define EMQ_ROUTE_CREATE_PERM 4294967296
+#define EMQ_ROUTE_EXIST_PERM 8589934592
+#define EMQ_ROUTE_LIST_PERM 17179869184
+#define EMQ_ROUTE_KEYS_PERM 34359738368
+#define EMQ_ROUTE_BIND_PERM 68719476736
+#define EMQ_ROUTE_UNBIND_PERM 137438953472
+#define EMQ_ROUTE_PUSH_PERM 274877906944
+#define EMQ_ROUTE_DELETE_PERM 549755813888
+
 #define EMQ_FLUSH_USER 1
 #define EMQ_FLUSH_QUEUE 2
-#define EMQ_FLUSH_ALL (EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE)
+#define EMQ_FLUSH_ROUTE 4
+#define EMQ_FLUSH_ALL (EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE | EMQ_FLUSH_ROUTE)
 
 #define EMQ_QUEUE_NONE 0
 #define EMQ_QUEUE_AUTODELETE 1
@@ -79,6 +89,11 @@
 
 #define EMQ_QUEUE_SUBSCRIBE_MSG 0
 #define EMQ_QUEUE_SUBSCRIBE_NOTIFY 1
+
+#define EMQ_ROUTE_NONE 0
+#define EMQ_ROUTE_AUTODELETE 1
+#define EMQ_ROUTE_ROUND_ROBIN 2
+#define EMQ_ROUTE_DURABLE 4
 
 #define EMQ_MAX_MSG 4294967295
 #define EMQ_MAX_MSG_SIZE 2147483647
@@ -142,6 +157,17 @@ typedef struct emq_queue {
 	uint32_t declared_clients;
 	uint32_t subscribed_clients;
 } emq_queue;
+
+typedef struct emq_route {
+	char name[64];
+	uint32_t flags;
+	uint32_t keys;
+} emq_route;
+
+typedef struct emq_route_key {
+	char key[32];
+	char queue[64];
+} emq_route_key;
 
 typedef struct emq_msg {
 	void *data;
@@ -210,6 +236,15 @@ int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, em
 int emq_queue_unsubscribe(emq_client *client, const char *name);
 int emq_queue_purge(emq_client *client, const char *name);
 int emq_queue_delete(emq_client *client, const char *name);
+
+int emq_route_create(emq_client *client, const char *name, uint32_t flags);
+int emq_route_exist(emq_client *client, const char *name);
+emq_list *emq_route_list(emq_client *client);
+emq_list *emq_route_keys(emq_client *client, const char *name);
+int emq_route_bind(emq_client *client, const char *name, const char *queue, const char *key);
+int emq_route_unbind(emq_client *client, const char *name, const char *queue, const char *key);
+int emq_route_push(emq_client *client, const char *name, const char *key, emq_msg *msg);
+int emq_route_delete(emq_client *client, const char *name);
 
 void emq_noack_enable(emq_client *client);
 void emq_noack_disable(emq_client *client);

@@ -59,7 +59,7 @@ static void user_management(emq_client *client)
 {
 	emq_list *users; /* users */
 	emq_user *user; /* user */
-	emq_list_iterator iter; /* iterator */
+	emq_list_iterator iter; /* list iterator */
 	emq_list_node *node; /* list node */
 	int status;
 
@@ -113,7 +113,7 @@ static void queue_management(emq_client *client)
 	const char *test_message = "test message"; /* test message data */
 	emq_list *queues; /* queues */
 	emq_queue *queue; /* queue */
-	emq_list_iterator iter; /* iterator */
+	emq_list_iterator iter; /* list iterator */
 	emq_list_node *node; /* list node */
 	emq_msg *msg; /* message for send to the server */
 	emq_msg *queue_msg;
@@ -248,6 +248,142 @@ static void queue_management(emq_client *client)
 	emq_msg_release(msg);
 }
 
+/* Example route management */
+static void route_management(emq_client *client)
+{
+	const char *test_message = "test message"; /* test message data */
+	emq_list *routes; /* routes */
+	emq_route *route; /* route */
+	emq_list *route_keys; /* route keys */
+	emq_route_key *route_key; /* route key */
+	emq_list_iterator iter; /* list iterator */
+	emq_list_node *node; /* list node */
+	emq_msg *msg; /* message for send to the server */
+	int messages;
+	int queue_size;
+	int status;
+
+	/* Create route with name ".route_1" */
+	status = emq_route_create(client, ".route_1", EMQ_ROUTE_NONE);
+	CHECK_STATUS("Route create", status);
+
+	/* Create queue with name ".queue_1" */
+	status = emq_queue_create(client, ".queue_1", EMQ_MAX_MSG, EMQ_MAX_MSG_SIZE, EMQ_QUEUE_NONE);
+	CHECK_STATUS("Queue create", status);
+
+	/* Create queue with name ".queue_2" */
+	status = emq_queue_create(client, ".queue_2", EMQ_MAX_MSG, EMQ_MAX_MSG_SIZE, EMQ_QUEUE_NONE);
+	CHECK_STATUS("Queue create", status);
+
+	/* Check on exist route with name ".route_1" */
+	status = emq_route_exist(client, ".route_1");
+	printf(YELLOW("[Success]") " Route \".route_1\" exist: %d\n", status);
+
+	/* Check on exist route with name "not-exist-route" */
+	status = emq_route_exist(client, "not-exist-route");
+	printf(YELLOW("[Success]") " Route \"not-exist-route\" exist: %d\n", status);
+
+	/* Request the route list */
+	routes = emq_route_list(client);
+	printf(YELLOW("[Route list]\n"));
+	if (routes != NULL) {
+		/* Enumeration of all routes */
+		emq_list_rewind(routes, &iter);
+		while ((node = emq_list_next(&iter)) != NULL)
+		{
+			route = EMQ_LIST_VALUE(node);
+			printf("Name: %s\n", route->name);
+			printf("Flags: %d\n", route->flags);
+			printf("Keys: %d\n", route->keys);
+			printf("-----------------------\n");
+		}
+		emq_list_release(routes);
+	} else {
+		printf(RED("[Error]") " emq_queue_list(%s)\n", EMQ_GET_ERROR(client));
+	}
+
+	/* Bind queue with name ".queue_1" to route with name ".route_1" and key "key1" */
+	status = emq_route_bind(client, ".route_1", ".queue_1", "key1");
+	CHECK_STATUS("Route bind", status);
+
+	/* Bind queue with name ".queue_2" to route with name ".route_1" and key "key1" */
+	status = emq_route_bind(client, ".route_1", ".queue_2", "key1");
+	CHECK_STATUS("Route bind", status);
+
+	/* Bind queue with name ".queue_2" to route with name ".route_1" and key "key2" */
+	status = emq_route_bind(client, ".route_1", ".queue_2", "key2");
+	CHECK_STATUS("Route bind", status);
+
+	/* Request the keys from route with name ".route_1" */
+	route_keys = emq_route_keys(client, ".route_1");
+	printf(YELLOW("[Route keys]\n"));
+	if (route_keys != NULL) {
+		/* Enumeration of all route keys */
+		emq_list_rewind(route_keys, &iter);
+		while ((node = emq_list_next(&iter)) != NULL)
+		{
+			route_key = EMQ_LIST_VALUE(node);
+			printf("Key: %s\n", route_key->key);
+			printf("Queue: %s\n", route_key->queue);
+			printf("-----------------------\n");
+		}
+		emq_list_release(route_keys);
+	} else {
+		printf(RED("[Error]") " emq_queue_list(%s)\n", EMQ_GET_ERROR(client));
+	}
+
+	/* Create message for push to the route */
+	msg = emq_msg_create((void*)test_message, strlen(test_message) + 1, EMQ_ZEROCOPY_ON);
+	if (msg == NULL) {
+		printf(RED("[Error]") " emq_msg_create\n");
+		exit(1);
+	}
+
+	/* Push five messages to route with name ".route_1" */
+	for (messages = 0; messages < 5; messages++) {
+		status = emq_route_push(client, ".route_1", "key1", msg);
+		CHECK_STATUS("Route push", status);
+		status = emq_route_push(client, ".route_1", "key2", msg);
+		CHECK_STATUS("Route push", status);
+		printf("-----------------------\n");
+	}
+
+	/* Release message */
+	emq_msg_release(msg);
+
+	/* Get size queue with name ".queue_1" */
+	queue_size = emq_queue_size(client, ".queue_1");
+	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
+
+	/* Get size queue with name ".queue_2" */
+	queue_size = emq_queue_size(client, ".queue_2");
+	printf(YELLOW("[Success]") " Queue \".queue_2\" size: %d\n", queue_size);
+
+	/* Unbind queue with name ".queue_1" from route with name ".route_1" and key "key1" */
+	status = emq_route_unbind(client, ".route_1", ".queue_1", "key1");
+	CHECK_STATUS("Route unbind", status);
+
+	/* Unbind queue with name ".queue_1" from route with name ".route_1" and key "key1" */
+	status = emq_route_unbind(client, ".route_1", ".queue_2", "key1");
+	CHECK_STATUS("Route unbind", status);
+
+	/* Unbind queue with name ".queue_1" from route with name ".route_1" and key "key2" */
+	status = emq_route_unbind(client, ".route_1", ".queue_2", "key2");
+	CHECK_STATUS("Route unbind", status);
+
+	/* Delete route with name ".route_1" */
+	status = emq_route_delete(client, ".route_1");
+	CHECK_STATUS("Route delete", status);
+
+	/* Delete queue with name ".queue_1" */
+	status = emq_queue_delete(client, ".queue_1");
+	CHECK_STATUS("Queue delete", status);
+
+	/* Delete queue with name ".queue_2" */
+	status = emq_queue_delete(client, ".queue_2");
+	CHECK_STATUS("Queue delete", status);
+}
+
 int main(int argc, char *argv[])
 {
 	/* Connect to server */
@@ -265,10 +401,11 @@ int main(int argc, char *argv[])
 		basic(client);
 		user_management(client);
 		queue_management(client);
+		route_management(client);
 
 		/* Delete all users and queues (you can use EMQ_FLUSH_ALL) */
-		status = emq_flush(client, EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE);
-		CHECK_STATUS("Flush all users and queues", status);
+		status = emq_flush(client, EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE | EMQ_FLUSH_ROUTE);
+		CHECK_STATUS("Flush all data", status);
 
 		/* Disconnect from server */
 		emq_disconnect(client);

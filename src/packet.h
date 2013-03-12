@@ -68,4 +68,13 @@ int emq_queue_unsubscribe_request(emq_client *client, const char *name);
 int emq_queue_purge_request(emq_client *client, const char *name);
 int emq_queue_delete_request(emq_client *client, const char *name);
 
+int emq_route_create_request(emq_client *client, const char *name, uint32_t flags);
+int emq_route_exist_request(emq_client *client, const char *name);
+int emq_route_list_request(emq_client *client);
+int emq_route_keys_request(emq_client *client, const char *name);
+int emq_route_bind_request(emq_client *client, const char *name, const char *queue, const char *key);
+int emq_route_unbind_request(emq_client *client, const char *name, const char *queue, const char *key);
+int emq_route_push_request(emq_client *client, const char *name, const char *key, uint32_t msg_size);
+int emq_route_delete_request(emq_client *client, const char *name);
+
 #endif
