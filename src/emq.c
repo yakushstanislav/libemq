@@ -231,12 +231,10 @@ static emq_queue *emq_queue_init(void)
 {
 	emq_queue *queue;
 
-	queue = (emq_queue*)malloc(sizeof(*queue));
+	queue = (emq_queue*)calloc(1, sizeof(*queue));
 	if (!queue) {
 		return NULL;
 	}
-
-	memset(queue, 0, sizeof(*queue));
 
 	return queue;
 }
@@ -250,12 +248,10 @@ static emq_route *emq_route_init(void)
 {
 	emq_route *route;
 
-	route = (emq_route*)malloc(sizeof(*route));
+	route = (emq_route*)calloc(1, sizeof(*route));
 	if (!route) {
 		return NULL;
 	}
-
-	memset(route, 0, sizeof(*route));
 
 	return route;
 }
@@ -269,12 +265,10 @@ static emq_route_key *emq_route_key_init(void)
 {
 	emq_route_key *route_key;
 
-	route_key = (emq_route_key*)malloc(sizeof(*route_key));
+	route_key = (emq_route_key*)calloc(1, sizeof(*route_key));
 	if (!route_key) {
 		return NULL;
 	}
-
-	memset(route_key, 0, sizeof(*route_key));
 
 	return route_key;
 }
