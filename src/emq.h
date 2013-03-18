@@ -52,6 +52,7 @@
 #define EMQ_LIST_VALUE(n) ((n)->value)
 
 #define EMQ_QUEUE_PERM 1
+#define EMQ_ROUTE_PERM 2
 #define EMQ_ADMIN_PERM 32
 #define EMQ_NOT_CHANGE_PERM 64
 #define EMQ_QUEUE_CREATE_PERM 1048576

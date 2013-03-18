@@ -581,132 +581,147 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
     </tr>
     <tr>
         <td>2</td>
+        <td>EMQ_ROUTE_PERM</td>
+        <td>
+			 <i>.route_create</i><br/>
+			 <i>.route_exist</i><br/>
+			 <i>.route_list</i><br/>
+			 <i>.route_keys</i><br/>
+			 <i>.route_bind</i><br/>
+			 <i>.route_unbind</i><br/>
+			 <i>.route_push</i><br/>
+			 <i>.route_delete</i><br/>
+		</td>
+        <td>The ability to perform all the commands associated with routes</td>
+    </tr>
+    <tr>
+        <td>3</td>
         <td>EMQ_ADMIN_PERM</td>
         <td>-</td>
         <td>The ability to perform all the commands on the server (including the commands for working with users)</td>
     </tr>
     <tr>
-        <td>3</td>
+        <td>4</td>
         <td>EMQ_NOT_CHANGE_PERM</td>
         <td>-</td>
         <td>If a user is created with the flag, then it can not be removed</td>
     </tr>
     <tr>
-        <td>4</td>
+        <td>5</td>
         <td>EMQ_QUEUE_CREATE_PERM</td>
         <td>.queue_create</td>
         <td>Permission to create queues</td>
     </tr>
     <tr>
-        <td>5</td>
+        <td>6</td>
         <td>EMQ_QUEUE_DECLARE_PERM</td>
         <td>.queue_declare</td>
         <td>Permission to declare the queue</td>
     </tr>
     <tr>
-        <td>6</td>
+        <td>7</td>
         <td>EMQ_QUEUE_EXIST_PERM</td>
         <td>.queue_exist</td>
         <td>Permission to check the existence of the queue</td>
     </tr>
     <tr>
-        <td>7</td>
+        <td>8</td>
         <td>EMQ_QUEUE_LIST_PERM</td>
         <td>.queue_list</td>
         <td>Permission to get a list of queues</td>
     </tr>
     <tr>
-        <td>8</td>
+        <td>9</td>
         <td>EMQ_QUEUE_SIZE_PERM</td>
         <td>.queue_size</td>
         <td>Permission to get the size of the queue</td>
     </tr>
     <tr>
-        <td>9</td>
+        <td>10</td>
         <td>EMQ_QUEUE_PUSH_PERM</td>
         <td>.queue_push</td>
         <td>Permission to push messages to the queue</td>
     </tr>
     <tr>
-        <td>10</td>
+        <td>11</td>
         <td>EMQ_QUEUE_GET_PERM</td>
         <td>.queue_get</td>
         <td>Permission to get messages from the queue</td>
     </tr>
     <tr>
-        <td>11</td>
+        <td>12</td>
         <td>EMQ_QUEUE_POP_PERM</td>
         <td>.queue_pop</td>
         <td>Permission to pop messages from the queue</td>
     </tr>
     <tr>
-        <td>12</td>
+        <td>13</td>
         <td>EMQ_QUEUE_SUBSCRIBE_PERM</td>
         <td>.queue_subscribe</td>
         <td>Permission to subscribe to the queue</td>
     </tr>
     <tr>
-        <td>13</td>
+        <td>14</td>
         <td>EMQ_QUEUE_UNSUBSCRIBE_PERM</td>
         <td>.queue_unsubscribe</td>
         <td>Permission to unsubscribe to the queue</td>
     </tr>
     <tr>
-        <td>14</td>
+        <td>15</td>
         <td>EMQ_QUEUE_PURGE_PERM</td>
         <td>.queue_purge</td>
         <td>Permission to delete all messages from the queue</td>
     </tr>
     <tr>
-        <td>15</td>
+        <td>16</td>
         <td>EMQ_QUEUE_DELETE_PERM</td>
         <td>.queue_delete</td>
         <td>Permission to delete queue</td>
     </tr>
     <tr>
-        <td>16</td>
+        <td>17</td>
         <td>EMQ_ROUTE_CREATE_PERM</td>
         <td>.route_create</td>
         <td>Permission to create route</td>
     </tr>
     <tr>
-        <td>17</td>
+        <td>18</td>
         <td>EMQ_ROUTE_EXIST_PERM</td>
         <td>.route_exist</td>
         <td>Permission to check the existence of the route</td>
     </tr>
     <tr>
-        <td>18</td>
+        <td>19</td>
         <td>EMQ_ROUTE_LIST_PERM</td>
         <td>.route_list</td>
         <td>Permission to get a list of routes</td>
     </tr>
     <tr>
-        <td>19</td>
+        <td>20</td>
         <td>EMQ_ROUTE_KEYS_PERM</td>
         <td>.route_keys</td>
         <td>Permission to get a list of route keys</td>
     </tr>
     <tr>
-        <td>20</td>
+        <td>21</td>
         <td>EMQ_ROUTE_BIND_PERM</td>
         <td>.route_bind</td>
         <td>Permission to bind route with the queue</td>
     </tr>
     <tr>
-        <td>21</td>
+        <td>22</td>
         <td>EMQ_ROUTE_UNBIND_PERM</td>
         <td>.route_unbind</td>
         <td>Permission to unbind route from the queue</td>
     </tr>
     <tr>
-        <td>22</td>
+        <td>23</td>
         <td>EMQ_ROUTE_PUSH_PERM</td>
         <td>.route_push</td>
         <td>Permission to push messages to the route</td>
     </tr>
     <tr>
-        <td>23</td>
+        <td>24</td>
         <td>EMQ_ROUTE_DELETE_PERM</td>
         <td>.route_delete</td>
         <td>Permission to delete route</td>
