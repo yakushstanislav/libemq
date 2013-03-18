@@ -663,6 +663,54 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
         <td>.queue_delete</td>
         <td>Permission to delete queue</td>
     </tr>
+    <tr>
+        <td>16</td>
+        <td>EMQ_ROUTE_CREATE_PERM</td>
+        <td>.route_create</td>
+        <td>Permission to create route</td>
+    </tr>
+    <tr>
+        <td>17</td>
+        <td>EMQ_ROUTE_EXIST_PERM</td>
+        <td>.route_exist</td>
+        <td>Permission to check the existence of the route</td>
+    </tr>
+    <tr>
+        <td>18</td>
+        <td>EMQ_ROUTE_LIST_PERM</td>
+        <td>.route_list</td>
+        <td>Permission to get a list of routes</td>
+    </tr>
+    <tr>
+        <td>19</td>
+        <td>EMQ_ROUTE_KEYS_PERM</td>
+        <td>.route_keys</td>
+        <td>Permission to get a list of route keys</td>
+    </tr>
+    <tr>
+        <td>20</td>
+        <td>EMQ_ROUTE_BIND_PERM</td>
+        <td>.route_bind</td>
+        <td>Permission to bind route with the queue</td>
+    </tr>
+    <tr>
+        <td>21</td>
+        <td>EMQ_ROUTE_UNBIND_PERM</td>
+        <td>.route_unbind</td>
+        <td>Permission to unbind route from the queue</td>
+    </tr>
+    <tr>
+        <td>22</td>
+        <td>EMQ_ROUTE_PUSH_PERM</td>
+        <td>.route_push</td>
+        <td>Permission to push messages to the route</td>
+    </tr>
+    <tr>
+        <td>23</td>
+        <td>EMQ_ROUTE_DELETE_PERM</td>
+        <td>.route_delete</td>
+        <td>Permission to delete route</td>
+    </tr>
 </table>
 
 ## Queue methods
@@ -963,6 +1011,222 @@ Delete the queue.
 		<td>2</td>
 		<td>name</td>
 		<td>the queue name</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+## Route methods
+
+### int emq\_route\_create(emq\_client *client, const char *name, uint32_t flags);
+Create the route.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>flags</td>
+		<td>flags to create a route (EMQ_ROUTE_NONE, EMQ_ROUTE_AUTODELETE, EMQ_ROUTE_ROUND_ROBIN, EMQ_ROUTE_DURABLE)</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_route\_exist(emq\_client *client, const char *name);
+Check the route of existence.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
+	</tr>
+</table>
+
+Return: Value greater than 0 if the route exists.
+
+### emq\_list *emq\_route\_list(emq\_client *client);
+Get a list of route.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+</table>
+
+Return: list of routes.
+
+### emq\_list *emq\_route\_keys(emq\_client *client, const char *name);
+Get a list of route keys.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
+	</tr>
+</table>
+
+Return: list of route keys.
+
+### int emq\_route\_bind(emq\_client *client, const char *name, const char *queue, const char *key);
+Bind the route with queue by key.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>queue</td>
+		<td>the queue name</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>key</td>
+		<td>the key</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_route\_unbind(emq\_client *client, const char *name, const char *queue, const char *key);
+Unbind the route from queue by a key.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>queue</td>
+		<td>the queue name</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>key</td>
+		<td>the key</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_route\_push(emq\_client *client, const char *name, const char *key, emq_msg *msg);
+Push a message to the route.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>key</td>
+		<td>the key</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>msg</td>
+		<td>the message</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_route\_delete(emq\_client *client, const char *name);
+Delete the route.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the route name</td>
 	</tr>
 </table>
 
