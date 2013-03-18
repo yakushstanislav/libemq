@@ -52,6 +52,7 @@ static void basic(emq_client *client)
 	printf("Clients: %d\n", stat.clients);
 	printf("Users: %d\n", stat.users);
 	printf("Queues: %d\n", stat.queues);
+	printf("Routes: %d\n", stat.routes);
 }
 
 /* Example user management */
