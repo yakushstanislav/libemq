@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/uio.h>
 
 #include "emq.h"
 #include "network.h"
@@ -1168,6 +1169,7 @@ error:
 int emq_queue_push(emq_client *client, const char *name, emq_msg *msg)
 {
 	protocol_response_header header;
+	struct iovec data[2];
 
 	EMQ_CLEAR_ERROR(client);
 
@@ -1181,12 +1183,12 @@ int emq_queue_push(emq_client *client, const char *name, emq_msg *msg)
 		goto error;
 	}
 
-	if (emq_client_write(client, client->request, client->pos) == -1) {
-		emq_client_set_error(client, EMQ_ERROR_WRITE);
-		goto error;
-	}
+	data[0].iov_base = client->request;
+	data[0].iov_len = client->pos;
+	data[1].iov_base = msg->data;
+	data[1].iov_len = msg->size;
 
-	if (emq_client_write(client, msg->data, msg->size) == -1) {
+	if (emq_client_writev(client, data, 2) == -1) {
 		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
@@ -1872,6 +1874,7 @@ error:
 int emq_route_push(emq_client *client, const char *name, const char *key, emq_msg *msg)
 {
 	protocol_response_header header;
+	struct iovec data[2];
 
 	EMQ_CLEAR_ERROR(client);
 
@@ -1885,12 +1888,12 @@ int emq_route_push(emq_client *client, const char *name, const char *key, emq_ms
 		goto error;
 	}
 
-	if (emq_client_write(client, client->request, client->pos) == -1) {
-		emq_client_set_error(client, EMQ_ERROR_WRITE);
-		goto error;
-	}
+	data[0].iov_base = client->request;
+	data[0].iov_len = client->pos;
+	data[1].iov_base = msg->data;
+	data[1].iov_len = msg->size;
 
-	if (emq_client_write(client, msg->data, msg->size) == -1) {
+	if (emq_client_writev(client, data, 2) == -1) {
 		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}

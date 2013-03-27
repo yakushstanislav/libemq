@@ -31,6 +31,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/un.h>
+#include <sys/uio.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
@@ -172,6 +173,11 @@ int emq_client_write(emq_client *client, char *buf, int count)
 	}
 
 	return totlen;
+}
+
+int emq_client_writev(emq_client *client, struct iovec *iov, int iovcnt)
+{
+	return writev(client->fd, iov, iovcnt);
 }
 
 void emq_client_disconnect(emq_client *client)

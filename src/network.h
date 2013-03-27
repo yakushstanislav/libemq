@@ -28,6 +28,8 @@
 #ifndef _EMQ_NETWORK_H_
 #define _EMQ_NETWORK_H_
 
+#include <sys/uio.h>
+
 #include "emq.h"
 
 #define EMQ_NET_OK 0
@@ -37,6 +39,7 @@ int emq_client_tcp_connect(emq_client *client, const char *addr, int port);
 int emq_client_unix_connect(emq_client *client, const char *path);
 int emq_client_read(emq_client *client, char *buf, int count);
 int emq_client_write(emq_client *client, char *buf, int count);
+int emq_client_writev(emq_client *client, struct iovec *iov, int iovcnt);
 void emq_client_disconnect(emq_client *client);
 
 #endif
