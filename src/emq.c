@@ -336,6 +336,7 @@ emq_msg *emq_msg_create(void *data, size_t size, int zero_copy)
 	}
 
 	msg->size = size;
+	msg->expire = 0;
 	msg->zero_copy = zero_copy;
 
 	if (!zero_copy) {
@@ -372,6 +373,11 @@ emq_msg *emq_msg_copy(emq_msg *msg)
 	memcpy(new_msg->data, msg->data, msg->size);
 
 	return new_msg;
+}
+
+void emq_msg_expire(emq_msg *msg, uint32_t time)
+{
+	msg->expire = time;
 }
 
 void *emq_msg_data(emq_msg *msg)
@@ -1169,7 +1175,7 @@ error:
 int emq_queue_push(emq_client *client, const char *name, emq_msg *msg)
 {
 	protocol_response_header header;
-	struct iovec data[2];
+	struct iovec data[3];
 
 	EMQ_CLEAR_ERROR(client);
 
@@ -1178,17 +1184,19 @@ int emq_queue_push(emq_client *client, const char *name, emq_msg *msg)
 		goto error;
 	}
 
-	if (emq_queue_push_request(client, name, msg->size) == EMQ_STATUS_ERR) {
+	if (emq_queue_push_request(client, name, sizeof(msg->expire) + msg->size) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	data[0].iov_base = client->request;
 	data[0].iov_len = client->pos;
-	data[1].iov_base = msg->data;
-	data[1].iov_len = msg->size;
+	data[1].iov_base = &msg->expire;
+	data[1].iov_len = sizeof(msg->expire);
+	data[2].iov_base = msg->data;
+	data[2].iov_len = msg->size;
 
-	if (emq_client_writev(client, data, 2) == -1) {
+	if (emq_client_writev(client, data, 3) == -1) {
 		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}
@@ -1874,7 +1882,7 @@ error:
 int emq_route_push(emq_client *client, const char *name, const char *key, emq_msg *msg)
 {
 	protocol_response_header header;
-	struct iovec data[2];
+	struct iovec data[3];
 
 	EMQ_CLEAR_ERROR(client);
 
@@ -1883,17 +1891,19 @@ int emq_route_push(emq_client *client, const char *name, const char *key, emq_ms
 		goto error;
 	}
 
-	if (emq_route_push_request(client, name, key, msg->size) == EMQ_STATUS_ERR) {
+	if (emq_route_push_request(client, name, key, sizeof(msg->expire) + msg->size) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
 
 	data[0].iov_base = client->request;
 	data[0].iov_len = client->pos;
-	data[1].iov_base = msg->data;
-	data[1].iov_len = msg->size;
+	data[1].iov_base = &msg->expire;
+	data[1].iov_len = sizeof(msg->expire);
+	data[2].iov_base = msg->data;
+	data[2].iov_len = msg->size;
 
-	if (emq_client_writev(client, data, 2) == -1) {
+	if (emq_client_writev(client, data, 3) == -1) {
 		emq_client_set_error(client, EMQ_ERROR_WRITE);
 		goto error;
 	}

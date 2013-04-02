@@ -247,6 +247,27 @@ Copy the message.
 
 Return: copy of the message.
 
+### void emq\_msg\_expire(emq\_msg *msg, uint32\_t time);
+Set expiration time for message.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>msg</td>
+		<td>the message</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>time</td>
+		<td>the time (in miliseconds)</td>
+	</tr>
+</table>
+
 ### void *emq\_msg\_data(emq\_msg *msg);
 Get the message data.
 
