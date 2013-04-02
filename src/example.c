@@ -165,8 +165,8 @@ static void queue_management(emq_client *client)
 			printf("Max msg size: %d\n", queue->max_msg_size);
 			printf("Flags: %d\n", queue->flags);
 			printf("Size: %d\n", queue->size);
-			printf("Declared clients %d\n", queue->declared_clients);
-			printf("Subscribed clients %d\n", queue->subscribed_clients);
+			printf("Declared clients: %d\n", queue->declared_clients);
+			printf("Subscribed clients: %d\n", queue->subscribed_clients);
 			printf("-----------------------\n");
 		}
 		emq_list_release(queues);
