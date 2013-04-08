@@ -174,6 +174,10 @@ static void queue_management(emq_client *client)
 		printf(RED("[Error]") " emq_queue_list(%s)\n", EMQ_GET_ERROR(client));
 	}
 
+	/* Rename queue with name ".queue_1" to ".queue_test" */
+	status = emq_queue_rename(client, ".queue_1", ".queue_test");
+	CHECK_STATUS("Queue rename", status);
+
 	/* Create message for push to the queue */
 	msg = emq_msg_create((void*)test_message, strlen(test_message) + 1, EMQ_ZEROCOPY_ON);
 	if (msg == NULL) {
@@ -181,9 +185,9 @@ static void queue_management(emq_client *client)
 		exit(1);
 	}
 
-	/* Push five messages to queues with name ".queue_1" and "queue-2" */
+	/* Push five messages to queues with name ".queue_test" and "queue-2" */
 	for (messages = 0; messages < 5; messages++) {
-		status = emq_queue_push(client, ".queue_1", msg);
+		status = emq_queue_push(client, ".queue_test", msg);
 		CHECK_STATUS("Queue push", status);
 
 		status = emq_queue_push(client, "queue-2", msg);
@@ -191,13 +195,13 @@ static void queue_management(emq_client *client)
 		printf("-----------------------\n");
 	}
 
-	/* Get size queue with name ".queue_1" */
-	queue_size = emq_queue_size(client, ".queue_1");
-	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
+	/* Get size queue with name ".queue_test" */
+	queue_size = emq_queue_size(client, ".queue_test");
+	printf(YELLOW("[Success]") " Queue \".queue_test\" size: %d\n", queue_size);
 
-	/* Get all messages from queue ".queue_1" */
+	/* Get all messages from queue ".queue_test" */
 	for (messages = 0; messages < queue_size; messages++) {
-		queue_msg = emq_queue_get(client, ".queue_1");
+		queue_msg = emq_queue_get(client, ".queue_test");
 		if (queue_msg != NULL)
 		{
 			printf(YELLOW("[Success]") " Get message: %s(%zu)\n",
@@ -206,9 +210,9 @@ static void queue_management(emq_client *client)
 		}
 	}
 
-	/* Get size queue with name ".queue_1" again */
-	queue_size = emq_queue_size(client, ".queue_1");
-	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
+	/* Get size queue with name ".queue_test" again */
+	queue_size = emq_queue_size(client, ".queue_test");
+	printf(YELLOW("[Success]") " Queue \".queue_test\" size: %d\n", queue_size);
 
 	/* Get size queue with name ".queue-2" */
 	queue_size = emq_queue_size(client, "queue-2");
@@ -229,16 +233,16 @@ static void queue_management(emq_client *client)
 	queue_size = emq_queue_size(client, "queue-2");
 	printf(YELLOW("[Success]") " Queue \"queue-2\" size: %d\n", queue_size);
 
-	/* Purge queue with name ".queue_1" */
-	status = emq_queue_purge(client, ".queue_1");
+	/* Purge queue with name ".queue_test" */
+	status = emq_queue_purge(client, ".queue_test");
 	CHECK_STATUS("Queue purge", status);
 
-	/* Get size queue with name ".queue_1" again */
-	queue_size = emq_queue_size(client, ".queue_1");
-	printf(YELLOW("[Success]") " Queue \".queue_1\" size: %d\n", queue_size);
+	/* Get size queue with name ".queue_test" again */
+	queue_size = emq_queue_size(client, ".queue_test");
+	printf(YELLOW("[Success]") " Queue \".queue_test\" size: %d\n", queue_size);
 
-	/* Delete queue with name ".queue_1" */
-	status = emq_queue_delete(client, ".queue_1");
+	/* Delete queue with name ".queue_test" */
+	status = emq_queue_delete(client, ".queue_test");
 	CHECK_STATUS("Queue delete", status);
 
 	/* Delete queue with name "queue-2" */
@@ -333,6 +337,10 @@ static void route_management(emq_client *client)
 		printf(RED("[Error]") " emq_queue_list(%s)\n", EMQ_GET_ERROR(client));
 	}
 
+	/* Rename route with name ".route_1" to ".route_test" */
+	status = emq_route_rename(client, ".route_1", ".route_test");
+	CHECK_STATUS("Route rename", status)
+
 	/* Create message for push to the route */
 	msg = emq_msg_create((void*)test_message, strlen(test_message) + 1, EMQ_ZEROCOPY_ON);
 	if (msg == NULL) {
@@ -340,11 +348,11 @@ static void route_management(emq_client *client)
 		exit(1);
 	}
 
-	/* Push five messages to route with name ".route_1" */
+	/* Push five messages to route with name ".route_test" */
 	for (messages = 0; messages < 5; messages++) {
-		status = emq_route_push(client, ".route_1", "key1", msg);
+		status = emq_route_push(client, ".route_test", "key1", msg);
 		CHECK_STATUS("Route push", status);
-		status = emq_route_push(client, ".route_1", "key2", msg);
+		status = emq_route_push(client, ".route_test", "key2", msg);
 		CHECK_STATUS("Route push", status);
 		printf("-----------------------\n");
 	}
@@ -360,20 +368,20 @@ static void route_management(emq_client *client)
 	queue_size = emq_queue_size(client, ".queue_2");
 	printf(YELLOW("[Success]") " Queue \".queue_2\" size: %d\n", queue_size);
 
-	/* Unbind queue with name ".queue_1" from route with name ".route_1" and key "key1" */
-	status = emq_route_unbind(client, ".route_1", ".queue_1", "key1");
+	/* Unbind queue with name ".queue_1" from route with name ".route_test" and key "key1" */
+	status = emq_route_unbind(client, ".route_test", ".queue_1", "key1");
 	CHECK_STATUS("Route unbind", status);
 
-	/* Unbind queue with name ".queue_1" from route with name ".route_1" and key "key1" */
-	status = emq_route_unbind(client, ".route_1", ".queue_2", "key1");
+	/* Unbind queue with name ".queue_1" from route with name ".route_test" and key "key1" */
+	status = emq_route_unbind(client, ".route_test", ".queue_2", "key1");
 	CHECK_STATUS("Route unbind", status);
 
-	/* Unbind queue with name ".queue_1" from route with name ".route_1" and key "key2" */
-	status = emq_route_unbind(client, ".route_1", ".queue_2", "key2");
+	/* Unbind queue with name ".queue_1" from route with name ".route_test" and key "key2" */
+	status = emq_route_unbind(client, ".route_test", ".queue_2", "key2");
 	CHECK_STATUS("Route unbind", status);
 
-	/* Delete route with name ".route_1" */
-	status = emq_route_delete(client, ".route_1");
+	/* Delete route with name ".route_test" */
+	status = emq_route_delete(client, ".route_test");
 	CHECK_STATUS("Route delete", status);
 
 	/* Delete queue with name ".queue_1" */

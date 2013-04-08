@@ -1128,6 +1128,48 @@ error:
 	return NULL;
 }
 
+int emq_queue_rename(emq_client *client, const char *from, const char *to)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_queue_rename_request(client, from, to) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_RENAME,
+			EMQ_PROTOCOL_SUCCESS_QUEUE_RENAME, EMQ_PROTOCOL_ERROR_QUEUE_RENAME, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_RENAME) == EMQ_STATUS_ERR) {
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
 int emq_queue_size(emq_client *client, const char *name)
 {
 	protocol_response_queue_size response;
@@ -1793,6 +1835,48 @@ emq_list *emq_route_keys(emq_client *client, const char *name)
 error:
 	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
 	return NULL;
+}
+
+int emq_route_rename(emq_client *client, const char *from, const char *to)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_route_rename_request(client, from, to) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_RENAME,
+			EMQ_PROTOCOL_SUCCESS_ROUTE_RENAME, EMQ_PROTOCOL_ERROR_ROUTE_RENAME, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_RENAME) == EMQ_STATUS_ERR) {
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
 }
 
 int emq_route_bind(emq_client *client, const char *name, const char *queue, const char *key)

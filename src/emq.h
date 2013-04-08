@@ -55,27 +55,30 @@
 #define EMQ_ROUTE_PERM 2
 #define EMQ_ADMIN_PERM 32
 #define EMQ_NOT_CHANGE_PERM 64
+
 #define EMQ_QUEUE_CREATE_PERM 1048576
 #define EMQ_QUEUE_DECLARE_PERM 2097152
 #define EMQ_QUEUE_EXIST_PERM 4194304
 #define EMQ_QUEUE_LIST_PERM 8388608
-#define EMQ_QUEUE_SIZE_PERM 16777216
-#define EMQ_QUEUE_PUSH_PERM 33554432
-#define EMQ_QUEUE_GET_PERM 67108864
-#define EMQ_QUEUE_POP_PERM 134217728
-#define EMQ_QUEUE_SUBSCRIBE_PERM 268435456
-#define EMQ_QUEUE_UNSUBSCRIBE_PERM 536870912
-#define EMQ_QUEUE_PURGE_PERM 1073741824
-#define EMQ_QUEUE_DELETE_PERM 2147483648
+#define EMQ_QUEUE_RENAME_PERM 16777216
+#define EMQ_QUEUE_SIZE_PERM 33554432
+#define EMQ_QUEUE_PUSH_PERM 67108864
+#define EMQ_QUEUE_GET_PERM 134217728
+#define EMQ_QUEUE_POP_PERM 268435456
+#define EMQ_QUEUE_SUBSCRIBE_PERM 536870912
+#define EMQ_QUEUE_UNSUBSCRIBE_PERM 1073741824
+#define EMQ_QUEUE_PURGE_PERM 2147483648
+#define EMQ_QUEUE_DELETE_PERM 4294967296
 
-#define EMQ_ROUTE_CREATE_PERM 4294967296
-#define EMQ_ROUTE_EXIST_PERM 8589934592
-#define EMQ_ROUTE_LIST_PERM 17179869184
-#define EMQ_ROUTE_KEYS_PERM 34359738368
-#define EMQ_ROUTE_BIND_PERM 68719476736
-#define EMQ_ROUTE_UNBIND_PERM 137438953472
-#define EMQ_ROUTE_PUSH_PERM 274877906944
-#define EMQ_ROUTE_DELETE_PERM 549755813888
+#define EMQ_ROUTE_CREATE_PERM 8589934592
+#define EMQ_ROUTE_EXIST_PERM 17179869184
+#define EMQ_ROUTE_LIST_PERM 34359738368
+#define EMQ_ROUTE_KEYS_PERM 68719476736
+#define EMQ_ROUTE_RENAME_PERM 137438953472
+#define EMQ_ROUTE_BIND_PERM 274877906944
+#define EMQ_ROUTE_UNBIND_PERM 549755813888
+#define EMQ_ROUTE_PUSH_PERM 1099511627776
+#define EMQ_ROUTE_DELETE_PERM 2199023255552
 
 #define EMQ_FLUSH_USER 1
 #define EMQ_FLUSH_QUEUE 2
@@ -231,6 +234,7 @@ int emq_queue_create(emq_client *client, const char *name, uint32_t max_msg, uin
 int emq_queue_declare(emq_client *client, const char *name);
 int emq_queue_exist(emq_client *client, const char *name);
 emq_list *emq_queue_list(emq_client *client);
+int emq_queue_rename(emq_client *client, const char *from, const char *to);
 int emq_queue_size(emq_client *client, const char *name);
 int emq_queue_push(emq_client *client, const char *name, emq_msg *msg);
 emq_msg *emq_queue_get(emq_client *client, const char *name);
@@ -244,6 +248,7 @@ int emq_route_create(emq_client *client, const char *name, uint32_t flags);
 int emq_route_exist(emq_client *client, const char *name);
 emq_list *emq_route_list(emq_client *client);
 emq_list *emq_route_keys(emq_client *client, const char *name);
+int emq_route_rename(emq_client *client, const char *from, const char *to);
 int emq_route_bind(emq_client *client, const char *name, const char *queue, const char *key);
 int emq_route_unbind(emq_client *client, const char *name, const char *queue, const char *key);
 int emq_route_push(emq_client *client, const char *name, const char *key, emq_msg *msg);

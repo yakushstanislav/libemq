@@ -405,6 +405,30 @@ int emq_queue_list_request(emq_client *client)
 	return EMQ_STATUS_OK;
 }
 
+int emq_queue_rename_request(emq_client *client, const char *from, const char *to)
+{
+	protocol_request_queue_rename req;
+
+	if (strlenz(from) > 64 || strlenz(to) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_RENAME, client->noack, sizeof(req.body));
+
+	memcpy(req.body.from, from, strlenz(from));
+	memcpy(req.body.to, to, strlenz(to));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
 int emq_queue_size_request(emq_client *client, const char *name)
 {
 	protocol_request_queue_size req;
@@ -667,6 +691,30 @@ int emq_route_keys_request(emq_client *client, const char *name)
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_KEYS, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_route_rename_request(emq_client *client, const char *from, const char *to)
+{
+	protocol_request_route_rename req;
+
+	if (strlenz(from) > 64 || strlenz(to) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_ROUTE_RENAME, client->noack, sizeof(req.body));
+
+	memcpy(req.body.from, from, strlenz(from));
+	memcpy(req.body.to, to, strlenz(to));
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;
