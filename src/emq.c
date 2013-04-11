@@ -468,13 +468,12 @@ int emq_auth(emq_client *client, const char *name, const char *password)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_AUTH,
-			EMQ_PROTOCOL_SUCCESS_AUTH, EMQ_PROTOCOL_ERROR_AUTH, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_AUTH, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_AUTH) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -510,13 +509,12 @@ int emq_ping(emq_client *client)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_PING,
-			EMQ_PROTOCOL_SUCCESS_PING, EMQ_PROTOCOL_ERROR_PING, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_PING, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_PING) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -550,13 +548,12 @@ int emq_stat(emq_client *client, emq_status *status)
 		goto error;
 	}
 
-	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_STAT,
-		EMQ_PROTOCOL_SUCCESS_STAT, EMQ_PROTOCOL_ERROR_STAT, sizeof(response.body)) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_STAT, sizeof(response.body)) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&response.header, EMQ_PROTOCOL_SUCCESS_STAT) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&response.header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -593,13 +590,12 @@ int emq_save(emq_client *client, uint8_t async)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_SAVE,
-			EMQ_PROTOCOL_SUCCESS_SAVE, EMQ_PROTOCOL_ERROR_SAVE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_SAVE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_SAVE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -635,13 +631,12 @@ int emq_flush(emq_client *client, uint32_t flags)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_FLUSH,
-			EMQ_PROTOCOL_SUCCESS_FLUSH, EMQ_PROTOCOL_ERROR_FLUSH, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_FLUSH, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_FLUSH) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -677,13 +672,12 @@ int emq_user_create(emq_client *client, const char *name, const char *password, 
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_CREATE,
-			EMQ_PROTOCOL_SUCCESS_USER_CREATE, EMQ_PROTOCOL_ERROR_USER_CREATE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_CREATE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_USER_CREATE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -721,13 +715,12 @@ emq_list *emq_user_list(emq_client *client)
 		goto error;
 	}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_USER_LIST,
-		EMQ_PROTOCOL_SUCCESS_USER_LIST, EMQ_PROTOCOL_ERROR_USER_LIST) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_USER_LIST) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_USER_LIST) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -803,13 +796,12 @@ int emq_user_rename(emq_client *client, const char *from, const char *to)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_RENAME,
-			EMQ_PROTOCOL_SUCCESS_USER_RENAME, EMQ_PROTOCOL_ERROR_USER_RENAME, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_RENAME, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_USER_RENAME) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -845,13 +837,12 @@ int emq_user_set_perm(emq_client *client, const char *name, emq_perm perm)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_SET_PERM,
-			EMQ_PROTOCOL_SUCCESS_USER_SET_PERM, EMQ_PROTOCOL_ERROR_USER_SET_PERM, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_SET_PERM, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_USER_SET_PERM) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -887,13 +878,12 @@ int emq_user_delete(emq_client *client, const char *name)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_DELETE,
-			EMQ_PROTOCOL_SUCCESS_USER_DELETE, EMQ_PROTOCOL_ERROR_USER_DELETE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_USER_DELETE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_USER_DELETE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -929,13 +919,12 @@ int emq_queue_create(emq_client *client, const char *name, uint32_t max_msg, uin
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_CREATE,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_CREATE, EMQ_PROTOCOL_ERROR_QUEUE_CREATE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_CREATE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_CREATE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -971,13 +960,12 @@ int emq_queue_declare(emq_client *client, const char *name)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_DECLARE,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_DECLARE, EMQ_PROTOCOL_ERROR_QUEUE_DECLARE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_DECLARE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_DECLARE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1012,12 +1000,12 @@ int emq_queue_exist(emq_client *client, const char *name)
 	}
 
 	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_QUEUE_EXIST,
-		EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST, EMQ_PROTOCOL_ERROR_QUEUE_EXIST, sizeof(response.body)) == EMQ_STATUS_ERR) {
+			sizeof(response.body)) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&response.header, EMQ_PROTOCOL_SUCCESS_QUEUE_EXIST) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&response.header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1059,13 +1047,12 @@ emq_list *emq_queue_list(emq_client *client)
 		goto error;
 	}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_LIST,
-		EMQ_PROTOCOL_SUCCESS_QUEUE_LIST, EMQ_PROTOCOL_ERROR_QUEUE_LIST) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_LIST) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_LIST) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1151,13 +1138,12 @@ int emq_queue_rename(emq_client *client, const char *from, const char *to)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_RENAME,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_RENAME, EMQ_PROTOCOL_ERROR_QUEUE_RENAME, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_RENAME, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_RENAME) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1192,12 +1178,12 @@ int emq_queue_size(emq_client *client, const char *name)
 	}
 
 	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_QUEUE_SIZE,
-		EMQ_PROTOCOL_SUCCESS_QUEUE_SIZE, EMQ_PROTOCOL_ERROR_QUEUE_SIZE, sizeof(response.body)) == EMQ_STATUS_ERR) {
+			sizeof(response.body)) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&response.header, EMQ_PROTOCOL_SUCCESS_QUEUE_SIZE) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&response.header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1250,13 +1236,12 @@ int emq_queue_push(emq_client *client, const char *name, emq_msg *msg)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_PUSH,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_PUSH, EMQ_PROTOCOL_ERROR_QUEUE_PUSH, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_PUSH, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_PUSH) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1321,13 +1306,12 @@ emq_msg *emq_queue_get(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_GET,
-		EMQ_PROTOCOL_SUCCESS_QUEUE_GET, EMQ_PROTOCOL_ERROR_QUEUE_GET) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_GET) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_GET) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1365,13 +1349,12 @@ emq_msg *emq_queue_pop(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_POP,
-		EMQ_PROTOCOL_SUCCESS_QUEUE_POP, EMQ_PROTOCOL_ERROR_QUEUE_POP) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_POP) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_POP) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1416,13 +1399,12 @@ int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, em
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_SUBSCRIBE, EMQ_PROTOCOL_ERROR_QUEUE_SUBSCRIBE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_SUBSCRIBE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1469,13 +1451,12 @@ int emq_queue_unsubscribe(emq_client *client, const char *name)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_UNSUBSCRIBE, EMQ_PROTOCOL_ERROR_QUEUE_UNSUBSCRIBE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_UNSUBSCRIBE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1520,13 +1501,12 @@ int emq_queue_purge(emq_client *client, const char *name)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_PURGE,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_PURGE, EMQ_PROTOCOL_ERROR_QUEUE_PURGE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_PURGE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_PURGE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1562,13 +1542,12 @@ int emq_queue_delete(emq_client *client, const char *name)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_DELETE,
-			EMQ_PROTOCOL_SUCCESS_QUEUE_DELETE, EMQ_PROTOCOL_ERROR_QUEUE_DELETE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_QUEUE_DELETE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_QUEUE_DELETE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1604,13 +1583,12 @@ int emq_route_create(emq_client *client, const char *name, uint32_t flags)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_CREATE,
-			EMQ_PROTOCOL_SUCCESS_ROUTE_CREATE, EMQ_PROTOCOL_ERROR_ROUTE_CREATE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_CREATE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_CREATE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1645,12 +1623,12 @@ int emq_route_exist(emq_client *client, const char *name)
 	}
 
 	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_ROUTE_EXIST,
-		EMQ_PROTOCOL_SUCCESS_ROUTE_EXIST, EMQ_PROTOCOL_ERROR_ROUTE_EXIST, sizeof(response.body)) == EMQ_STATUS_ERR) {
+			sizeof(response.body)) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&response.header, EMQ_PROTOCOL_SUCCESS_ROUTE_EXIST) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&response.header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1692,13 +1670,12 @@ emq_list *emq_route_list(emq_client *client)
 		goto error;
 	}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_ROUTE_LIST,
-		EMQ_PROTOCOL_SUCCESS_ROUTE_LIST, EMQ_PROTOCOL_ERROR_ROUTE_LIST) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_ROUTE_LIST) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_LIST) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1778,13 +1755,12 @@ emq_list *emq_route_keys(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_ROUTE_KEYS,
-		EMQ_PROTOCOL_SUCCESS_ROUTE_KEYS, EMQ_PROTOCOL_ERROR_ROUTE_KEYS) == EMQ_STATUS_ERR) {
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_ROUTE_KEYS) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 		goto error;
 	}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_KEYS) == EMQ_STATUS_ERR) {
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 		goto error;
 	}
 
@@ -1860,13 +1836,12 @@ int emq_route_rename(emq_client *client, const char *from, const char *to)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_RENAME,
-			EMQ_PROTOCOL_SUCCESS_ROUTE_RENAME, EMQ_PROTOCOL_ERROR_ROUTE_RENAME, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_RENAME, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_RENAME) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1902,13 +1877,12 @@ int emq_route_bind(emq_client *client, const char *name, const char *queue, cons
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_BIND,
-			EMQ_PROTOCOL_SUCCESS_ROUTE_BIND, EMQ_PROTOCOL_ERROR_ROUTE_BIND, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_BIND, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_BIND) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1944,13 +1918,12 @@ int emq_route_unbind(emq_client *client, const char *name, const char *queue, co
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_UNBIND,
-			EMQ_PROTOCOL_SUCCESS_ROUTE_UNBIND, EMQ_PROTOCOL_ERROR_ROUTE_UNBIND, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_UNBIND, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_UNBIND) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -1999,13 +1972,12 @@ int emq_route_push(emq_client *client, const char *name, const char *key, emq_ms
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_PUSH,
-			EMQ_PROTOCOL_SUCCESS_ROUTE_PUSH, EMQ_PROTOCOL_ERROR_ROUTE_PUSH, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_PUSH, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_PUSH) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}
@@ -2041,13 +2013,12 @@ int emq_route_delete(emq_client *client, const char *name)
 			goto error;
 		}
 
-		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_DELETE,
-			EMQ_PROTOCOL_SUCCESS_ROUTE_DELETE, EMQ_PROTOCOL_ERROR_ROUTE_DELETE, 0) == EMQ_STATUS_ERR) {
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_ROUTE_DELETE, 0) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
 			goto error;
 		}
 
-		if (emq_check_status(&header, EMQ_PROTOCOL_SUCCESS_ROUTE_DELETE) == EMQ_STATUS_ERR) {
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
 			goto error;
 		}
 	}

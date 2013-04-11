@@ -33,11 +33,9 @@
 #include "emq.h"
 #include "protocol.h"
 
-int emq_check_response_header(protocol_response_header *header, uint8_t cmd,
-	uint8_t status_success, uint8_t status_error, uint32_t bodylen);
+int emq_check_response_header(protocol_response_header *header, uint8_t cmd, uint32_t bodylen);
 
-int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd,
-	uint8_t status_success, uint8_t status_error);
+int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd);
 
 int emq_check_event_header(protocol_event_header *header, uint8_t cmd, uint8_t type1, uint8_t type2);
 
