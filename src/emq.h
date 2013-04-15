@@ -108,6 +108,13 @@
 #define EMQ_ERROR_WRITE 3
 #define EMQ_ERROR_READ 4
 #define EMQ_ERROR_RESPONSE 5
+#define EMQ_ERROR_PACKET 6
+#define EMQ_ERROR_COMMAND 7
+#define EMQ_ERROR_ACCESS 8
+#define EMQ_ERROR_MEMORY 9
+#define EMQ_ERROR_NOT_DECLARED 10
+#define EMQ_ERROR_NOT_FOUND 11
+#define EMQ_ERROR_NO_DATA 12
 
 #define EMQ_GET_ERROR(client) (client->error)
 #define EMQ_ISSET_ERROR(client) (client->error[0] != '\0')

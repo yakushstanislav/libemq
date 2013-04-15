@@ -102,6 +102,47 @@ int emq_check_status(protocol_response_header *header, uint8_t status)
 	return header->status == status ? EMQ_STATUS_OK : EMQ_STATUS_ERR;
 }
 
+int emq_get_error(protocol_response_header *header)
+{
+	int error;
+
+	switch (header->status)
+	{
+		case EMQ_PROTOCOL_STATUS_ERROR_PACKET:
+			error = EMQ_ERROR_PACKET;
+			break;
+
+		case EMQ_PROTOCOL_STATUS_ERROR_COMMAND:
+			error = EMQ_ERROR_COMMAND;
+			break;
+
+		case EMQ_PROTOCOL_STATUS_ERROR_ACCESS:
+			error = EMQ_ERROR_ACCESS;
+			break;
+
+		case EMQ_PROTOCOL_STATUS_ERROR_MEMORY:
+			error = EMQ_ERROR_MEMORY;
+			break;
+
+		case EMQ_PROTOCOL_STATUS_ERROR_NOT_DECLARED:
+			error = EMQ_ERROR_NOT_DECLARED;
+			break;
+
+		case EMQ_PROTOCOL_STATUS_ERROR_NOT_FOUND:
+			error = EMQ_ERROR_NOT_FOUND;
+			break;
+
+		case EMQ_PROTOCOL_STATUS_ERROR_NO_DATA:
+			error = EMQ_ERROR_NO_DATA;
+			break;
+
+		default:
+			error = EMQ_ERROR_NONE;
+	}
+
+	return error;
+}
+
 int emq_auth_request(emq_client *client, const char *name, const char *password)
 {
 	protocol_request_auth req;
