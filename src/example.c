@@ -226,10 +226,10 @@ static void queue_management(emq_client *client)
 			printf(YELLOW("[Success]") " Pop message: %s(%zu)\n",
 				(char*)emq_msg_data(queue_msg), emq_msg_size(queue_msg));
 			emq_msg_release(queue_msg);
-		}
 
-		status = emq_queue_confirm(client, "queue-2", emq_msg_tag(queue_msg));
-		CHECK_STATUS("Queue confirm", status);
+			status = emq_queue_confirm(client, "queue-2", emq_msg_tag(queue_msg));
+			CHECK_STATUS("Queue confirm", status);
+		}
 	}
 
 	/* Get size queue with name "queue-2" */
