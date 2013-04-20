@@ -62,7 +62,8 @@ int emq_queue_rename_request(emq_client *client, const char *from, const char *t
 int emq_queue_size_request(emq_client *client, const char *name);
 int emq_queue_push_request(emq_client *client, const char *name, uint32_t msg_size);
 int emq_queue_get_request(emq_client *client, const char *name);
-int emq_queue_pop_request(emq_client *client, const char *name);
+int emq_queue_pop_request(emq_client *client, const char *name, uint32_t timeout);
+int emq_queue_confirm_request(emq_client *client, const char *name, uint64_t tag);
 int emq_queue_subscribe_request(emq_client *client, const char *name, uint32_t flags);
 int emq_queue_unsubscribe_request(emq_client *client, const char *name);
 int emq_queue_purge_request(emq_client *client, const char *name);

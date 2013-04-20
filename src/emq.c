@@ -343,6 +343,7 @@ emq_msg *emq_msg_create(void *data, size_t size, int zero_copy)
 	}
 
 	msg->size = size;
+	msg->tag = 0;
 	msg->expire = 0;
 	msg->zero_copy = zero_copy;
 
@@ -371,6 +372,8 @@ emq_msg *emq_msg_copy(emq_msg *msg)
 
 	new_msg->data = malloc(msg->size);
 	new_msg->size = msg->size;
+	new_msg->tag = msg->tag;
+	new_msg->expire = msg->expire;
 
 	if (!new_msg->data) {
 		free(new_msg);
@@ -382,7 +385,7 @@ emq_msg *emq_msg_copy(emq_msg *msg)
 	return new_msg;
 }
 
-void emq_msg_expire(emq_msg *msg, uint32_t time)
+void emq_msg_expire(emq_msg *msg, emq_time time)
 {
 	msg->expire = time;
 }
@@ -395,6 +398,11 @@ void *emq_msg_data(emq_msg *msg)
 size_t emq_msg_size(emq_msg *msg)
 {
 	return msg->size;
+}
+
+emq_tag emq_msg_tag(emq_msg *msg)
+{
+	return msg->tag;
 }
 
 void emq_msg_release(emq_msg *msg)
@@ -1290,6 +1298,8 @@ static emq_msg *emq_read_message(emq_client *client, size_t size)
 
 	msg->data = malloc(size);
 	msg->size = size;
+	msg->tag = 0;
+	msg->expire = 0;
 	msg->zero_copy = EMQ_ZEROCOPY_OFF;
 
 	if (!msg->data) {
@@ -1304,6 +1314,22 @@ static emq_msg *emq_read_message(emq_client *client, size_t size)
 		free(msg);
 		return NULL;
 	}
+
+	return msg;
+}
+
+static emq_msg *emq_read_message_tag(emq_client *client, size_t size)
+{
+	emq_msg *msg;
+	uint64_t tag;
+
+	if (emq_client_read(client, (char*)&tag, sizeof(tag)) == -1) {
+		return NULL;
+	}
+
+	msg = emq_read_message(client, size - sizeof(tag));
+
+	msg->tag = tag;
 
 	return msg;
 }
@@ -1340,7 +1366,7 @@ emq_msg *emq_queue_get(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if ((msg = emq_read_message(client, header.bodylen)) == NULL) {
+	if ((msg = emq_read_message_tag(client, header.bodylen)) == NULL) {
 		goto error;
 	}
 
@@ -1352,14 +1378,14 @@ error:
 	return NULL;
 }
 
-emq_msg *emq_queue_pop(emq_client *client, const char *name)
+emq_msg *emq_queue_pop(emq_client *client, const char *name, uint32_t timeout)
 {
 	protocol_response_header header;
 	emq_msg *msg;
 
 	EMQ_CLEAR_ERROR(client);
 
-	if (emq_queue_pop_request(client, name) == EMQ_STATUS_ERR) {
+	if (emq_queue_pop_request(client, name, timeout) == EMQ_STATUS_ERR) {
 		emq_client_set_error(client, EMQ_ERROR_DATA);
 		goto error;
 	}
@@ -1384,7 +1410,7 @@ emq_msg *emq_queue_pop(emq_client *client, const char *name)
 		goto error;
 	}
 
-	if ((msg = emq_read_message(client, header.bodylen)) == NULL) {
+	if ((msg = emq_read_message_tag(client, header.bodylen)) == NULL) {
 		goto error;
 	}
 
@@ -1394,6 +1420,45 @@ emq_msg *emq_queue_pop(emq_client *client, const char *name)
 error:
 	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
 	return NULL;
+}
+
+int emq_queue_confirm(emq_client *client, const char *name, emq_tag tag)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_queue_confirm_request(client, name, tag) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		goto error;
+	}
+
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_CONFIRM) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+		goto error;
+	}
+
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, emq_get_error(&header));
+		goto error;
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
 }
 
 int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, emq_msg_callback *callback)

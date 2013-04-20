@@ -52,7 +52,7 @@ typedef enum protocol_command {
 	EMQ_PROTOCOL_CMD_USER_SET_PERM = 0x21,
 	EMQ_PROTOCOL_CMD_USER_DELETE = 0x22,
 
-	/* queue commands (35..47) */
+	/* queue commands (35..48) */
 	EMQ_PROTOCOL_CMD_QUEUE_CREATE = 0x23,
 	EMQ_PROTOCOL_CMD_QUEUE_DECLARE = 0x24,
 	EMQ_PROTOCOL_CMD_QUEUE_EXIST = 0x25,
@@ -62,21 +62,22 @@ typedef enum protocol_command {
 	EMQ_PROTOCOL_CMD_QUEUE_PUSH = 0x29,
 	EMQ_PROTOCOL_CMD_QUEUE_GET = 0x2A,
 	EMQ_PROTOCOL_CMD_QUEUE_POP = 0x2B,
-	EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE = 0x2C,
-	EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE = 0x2D,
-	EMQ_PROTOCOL_CMD_QUEUE_PURGE = 0x2E,
-	EMQ_PROTOCOL_CMD_QUEUE_DELETE = 0x2F,
+	EMQ_PROTOCOL_CMD_QUEUE_CONFIRM = 0x2C,
+	EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE = 0x2D,
+	EMQ_PROTOCOL_CMD_QUEUE_UNSUBSCRIBE = 0x2E,
+	EMQ_PROTOCOL_CMD_QUEUE_PURGE = 0x2F,
+	EMQ_PROTOCOL_CMD_QUEUE_DELETE = 0x30,
 
-	/* route commands (48..56) */
-	EMQ_PROTOCOL_CMD_ROUTE_CREATE = 0x30,
-	EMQ_PROTOCOL_CMD_ROUTE_EXIST = 0x31,
-	EMQ_PROTOCOL_CMD_ROUTE_LIST = 0x32,
-	EMQ_PROTOCOL_CMD_ROUTE_KEYS = 0x33,
-	EMQ_PROTOCOL_CMD_ROUTE_RENAME = 0x34,
-	EMQ_PROTOCOL_CMD_ROUTE_BIND = 0x35,
-	EMQ_PROTOCOL_CMD_ROUTE_UNBIND = 0x36,
-	EMQ_PROTOCOL_CMD_ROUTE_PUSH = 0x37,
-	EMQ_PROTOCOL_CMD_ROUTE_DELETE = 0x38
+	/* route commands (49..57) */
+	EMQ_PROTOCOL_CMD_ROUTE_CREATE = 0x31,
+	EMQ_PROTOCOL_CMD_ROUTE_EXIST = 0x32,
+	EMQ_PROTOCOL_CMD_ROUTE_LIST = 0x33,
+	EMQ_PROTOCOL_CMD_ROUTE_KEYS = 0x34,
+	EMQ_PROTOCOL_CMD_ROUTE_RENAME = 0x35,
+	EMQ_PROTOCOL_CMD_ROUTE_BIND = 0x36,
+	EMQ_PROTOCOL_CMD_ROUTE_UNBIND = 0x37,
+	EMQ_PROTOCOL_CMD_ROUTE_PUSH = 0x38,
+	EMQ_PROTOCOL_CMD_ROUTE_DELETE = 0x39
 } protocol_command;
 
 typedef enum protocol_response_status {
@@ -240,8 +241,17 @@ typedef struct protocol_request_queue_pop {
 	protocol_request_header header;
 	struct {
 		char name[64];
+		uint32_t timeout;
 	} body;
 } protocol_request_queue_pop;
+
+typedef struct protocol_request_queue_confirm {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		uint64_t tag;
+	} body;
+} protocol_request_queue_confirm;
 
 typedef struct protocol_request_queue_subscribe {
 	protocol_request_header header;

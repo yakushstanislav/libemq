@@ -534,7 +534,7 @@ int emq_queue_get_request(emq_client *client, const char *name)
 	return EMQ_STATUS_OK;
 }
 
-int emq_queue_pop_request(emq_client *client, const char *name)
+int emq_queue_pop_request(emq_client *client, const char *name, uint32_t timeout)
 {
 	protocol_request_queue_pop req;
 
@@ -547,6 +547,31 @@ int emq_queue_pop_request(emq_client *client, const char *name)
 	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_POP, client->noack, sizeof(req.body));
 
 	memcpy(req.body.name, name, strlenz(name));
+	req.body.timeout = timeout;
+
+	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
+		return EMQ_STATUS_ERR;
+	}
+
+	emq_set_client_request(client, &req, sizeof(req));
+
+	return EMQ_STATUS_OK;
+}
+
+int emq_queue_confirm_request(emq_client *client, const char *name, uint64_t tag)
+{
+	protocol_request_queue_confirm req;
+
+	if (strlenz(name) > 64) {
+		return EMQ_STATUS_ERR;
+	}
+
+	memset(&req, 0, sizeof(req));
+
+	emq_set_header_request(&req.header, EMQ_PROTOCOL_CMD_QUEUE_CONFIRM, client->noack, sizeof(req.body));
+
+	memcpy(req.body.name, name, strlenz(name));
+	req.body.tag = tag;
 
 	if (emq_check_realloc_client_request(client, sizeof(req)) == EMQ_STATUS_ERR) {
 		return EMQ_STATUS_ERR;

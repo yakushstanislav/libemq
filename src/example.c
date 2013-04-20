@@ -220,13 +220,16 @@ static void queue_management(emq_client *client)
 
 	/* Pop all messages from queue "queue-2" */
 	for (messages = 0; messages < queue_size; messages++) {
-		queue_msg = emq_queue_pop(client, "queue-2");
+		queue_msg = emq_queue_pop(client, "queue-2", 1000);
 		if (queue_msg != NULL)
 		{
 			printf(YELLOW("[Success]") " Pop message: %s(%zu)\n",
 				(char*)emq_msg_data(queue_msg), emq_msg_size(queue_msg));
 			emq_msg_release(queue_msg);
 		}
+
+		status = emq_queue_confirm(client, "queue-2", emq_msg_tag(queue_msg));
+		CHECK_STATUS("Queue confirm", status);
 	}
 
 	/* Get size queue with name "queue-2" */

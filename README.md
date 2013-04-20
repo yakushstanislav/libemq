@@ -247,7 +247,7 @@ Copy the message.
 
 Return: copy of the message.
 
-### void emq\_msg\_expire(emq\_msg *msg, uint32\_t time);
+### void emq\_msg\_expire(emq\_msg *msg, emq\_time time);
 Set expiration time for message.
 
 <table border="1">
@@ -303,6 +303,24 @@ Get the message size.
 </table>
 
 Return: size of the message.
+
+### emq\_tag emq\_msg\_tag(emq\_msg *msg);
+Get tag of the message.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>msg</td>
+		<td>the message</td>
+	</tr>
+</table>
+
+Return: tag of the message.
 
 ### void emq\_msg\_release(emq\_msg *msg)
 Delete the message.
@@ -594,6 +612,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
             <i>.queue_push</i><br/>
             <i>.queue_get</i><br/>
             <i>.queue_pop</i><br/>
+            <i>.queue_confirm</i><br/>
             <i>.queue_subscribe</i><br/>
             <i>.queue_unsubscribe</i><br/>
             <i>.queue_purge</i><br/>
@@ -685,78 +704,84 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
     </tr>
     <tr>
         <td>14</td>
+        <td>EMQ_QUEUE_CONFIRM_PERM</td>
+        <td>.queue_confirm</td>
+        <td>Permission to confirm delivery for the message</td>
+    </tr>
+    <tr>
+        <td>15</td>
         <td>EMQ_QUEUE_SUBSCRIBE_PERM</td>
         <td>.queue_subscribe</td>
         <td>Permission to subscribe to the queue</td>
     </tr>
     <tr>
-        <td>15</td>
+        <td>16</td>
         <td>EMQ_QUEUE_UNSUBSCRIBE_PERM</td>
         <td>.queue_unsubscribe</td>
         <td>Permission to unsubscribe to the queue</td>
     </tr>
     <tr>
-        <td>16</td>
+        <td>17</td>
         <td>EMQ_QUEUE_PURGE_PERM</td>
         <td>.queue_purge</td>
         <td>Permission to delete all messages from the queue</td>
     </tr>
     <tr>
-        <td>17</td>
+        <td>18</td>
         <td>EMQ_QUEUE_DELETE_PERM</td>
         <td>.queue_delete</td>
         <td>Permission to delete queue</td>
     </tr>
     <tr>
-        <td>18</td>
+        <td>19</td>
         <td>EMQ_ROUTE_CREATE_PERM</td>
         <td>.route_create</td>
         <td>Permission to create route</td>
     </tr>
     <tr>
-        <td>19</td>
+        <td>20</td>
         <td>EMQ_ROUTE_EXIST_PERM</td>
         <td>.route_exist</td>
         <td>Permission to check the existence of the route</td>
     </tr>
     <tr>
-        <td>20</td>
+        <td>21</td>
         <td>EMQ_ROUTE_LIST_PERM</td>
         <td>.route_list</td>
         <td>Permission to get a list of routes</td>
     </tr>
     <tr>
-        <td>21</td>
+        <td>22</td>
         <td>EMQ_ROUTE_KEYS_PERM</td>
         <td>.route_keys</td>
         <td>Permission to get a list of route keys</td>
     </tr>
     <tr>
-        <td>22</td>
+        <td>23</td>
         <td>EMQ_ROUTE_RENAME_PERM</td>
         <td>.route_rename</td>
         <td>Permission to rename the route</td>
     </tr>
     <tr>
-        <td>23</td>
+        <td>24</td>
         <td>EMQ_ROUTE_BIND_PERM</td>
         <td>.route_bind</td>
         <td>Permission to bind route with the queue</td>
     </tr>
     <tr>
-        <td>24</td>
+        <td>25</td>
         <td>EMQ_ROUTE_UNBIND_PERM</td>
         <td>.route_unbind</td>
         <td>Permission to unbind route from the queue</td>
     </tr>
     <tr>
-        <td>25</td>
+        <td>26</td>
         <td>EMQ_ROUTE_PUSH_PERM</td>
         <td>.route_push</td>
         <td>Permission to push messages to the route</td>
     </tr>
     <tr>
-        <td>26</td>
+        <td>27</td>
         <td>EMQ_ROUTE_DELETE_PERM</td>
         <td>.route_delete</td>
         <td>Permission to delete route</td>
@@ -969,7 +994,7 @@ Get a message from the queue.
 
 Return: message on success, NULL on error.
 
-### emq\_msg *emq\_queue\_pop(emq\_client *client, const char *name);
+### emq\_msg *emq\_queue\_pop(emq\_client *client, const char *name, uint32\_t timeout);
 Pop a message from the queue.
 
 <table border="1">
@@ -988,9 +1013,42 @@ Pop a message from the queue.
 		<td>name</td>
 		<td>the queue name</td>
 	</tr>
+	<tr>
+		<td>3</td>
+		<td>timeout</td>
+		<td>the timeout for wait confirm delivery</td>
+	</tr>
 </table>
 
 Return: message on success, NULL on error.
+
+### int emq\_queue\_confirm(emq\_client *client, const char *name, emq\_tag tag);
+Confirm delivery message.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the queue name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>tag</td>
+		<td>the message tag</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 
 ### int emq\_queue\_subscribe(emq\_client *client, const char *name, uint32\_t flags, emq\_msg\_callback *callback);
 Subscribe to the queue.

@@ -65,20 +65,21 @@
 #define EMQ_QUEUE_PUSH_PERM 67108864
 #define EMQ_QUEUE_GET_PERM 134217728
 #define EMQ_QUEUE_POP_PERM 268435456
-#define EMQ_QUEUE_SUBSCRIBE_PERM 536870912
-#define EMQ_QUEUE_UNSUBSCRIBE_PERM 1073741824
-#define EMQ_QUEUE_PURGE_PERM 2147483648
-#define EMQ_QUEUE_DELETE_PERM 4294967296
+#define EMQ_QUEUE_CONFIRM_PERM 536870912
+#define EMQ_QUEUE_SUBSCRIBE_PERM 1073741824
+#define EMQ_QUEUE_UNSUBSCRIBE_PERM 2147483648
+#define EMQ_QUEUE_PURGE_PERM 4294967296
+#define EMQ_QUEUE_DELETE_PERM 8589934592
 
-#define EMQ_ROUTE_CREATE_PERM 8589934592
-#define EMQ_ROUTE_EXIST_PERM 17179869184
-#define EMQ_ROUTE_LIST_PERM 34359738368
-#define EMQ_ROUTE_KEYS_PERM 68719476736
-#define EMQ_ROUTE_RENAME_PERM 137438953472
-#define EMQ_ROUTE_BIND_PERM 274877906944
-#define EMQ_ROUTE_UNBIND_PERM 549755813888
-#define EMQ_ROUTE_PUSH_PERM 1099511627776
-#define EMQ_ROUTE_DELETE_PERM 2199023255552
+#define EMQ_ROUTE_CREATE_PERM 17179869184
+#define EMQ_ROUTE_EXIST_PERM 34359738368
+#define EMQ_ROUTE_LIST_PERM 68719476736
+#define EMQ_ROUTE_KEYS_PERM 137438953472
+#define EMQ_ROUTE_RENAME_PERM 274877906944
+#define EMQ_ROUTE_BIND_PERM 549755813888
+#define EMQ_ROUTE_UNBIND_PERM 1099511627776
+#define EMQ_ROUTE_PUSH_PERM 2199023255552
+#define EMQ_ROUTE_DELETE_PERM 4398046511104
 
 #define EMQ_FLUSH_USER 1
 #define EMQ_FLUSH_QUEUE 2
@@ -152,6 +153,8 @@ typedef struct emq_client {
 } emq_client;
 
 typedef uint64_t emq_perm;
+typedef uint64_t emq_tag;
+typedef uint32_t emq_time;
 
 typedef struct emq_user {
 	char name[32];
@@ -183,7 +186,8 @@ typedef struct emq_route_key {
 typedef struct emq_msg {
 	void *data;
 	size_t size;
-	uint32_t expire;
+	emq_tag tag;
+	emq_time expire;
 	int zero_copy;
 } emq_msg;
 
@@ -216,9 +220,10 @@ typedef struct emq_status {
 
 emq_msg *emq_msg_create(void *data, size_t size, int zero_copy);
 emq_msg *emq_msg_copy(emq_msg *msg);
-void emq_msg_expire(emq_msg *msg, uint32_t time);
+void emq_msg_expire(emq_msg *msg, emq_time time);
 void *emq_msg_data(emq_msg *msg);
 size_t emq_msg_size(emq_msg *msg);
+emq_tag emq_msg_tag(emq_msg *msg);
 void emq_msg_release(emq_msg *msg);
 
 emq_client *emq_tcp_connect(const char *addr, int port);
@@ -245,7 +250,8 @@ int emq_queue_rename(emq_client *client, const char *from, const char *to);
 int emq_queue_size(emq_client *client, const char *name);
 int emq_queue_push(emq_client *client, const char *name, emq_msg *msg);
 emq_msg *emq_queue_get(emq_client *client, const char *name);
-emq_msg *emq_queue_pop(emq_client *client, const char *name);
+emq_msg *emq_queue_pop(emq_client *client, const char *name, uint32_t timeout);
+int emq_queue_confirm(emq_client *client, const char *name, emq_tag tag);
 int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, emq_msg_callback *callback);
 int emq_queue_unsubscribe(emq_client *client, const char *name);
 int emq_queue_purge(emq_client *client, const char *name);
