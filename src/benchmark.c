@@ -11,6 +11,7 @@
 #define DEFAULT_PORT 7851
 #define DEFAULT_USER_NAME "eagle"
 #define DEFAULT_USER_PASSWORD "eagle"
+#define DEFAULT_EXPIRATION_TIME 0
 
 #define DEFAULT_CLIENTS 50
 #define DEFAULT_MESSAGES 100000
@@ -30,6 +31,7 @@ static struct config {
 	int clients;
 	int messages;
 	int msg_size;
+	int expiration;
 	int noack;
 } config;
 
@@ -90,6 +92,8 @@ static void *worker(void *data)
 		emq_queue_declare(client, QUEUE_NAME);
 
 		message = emq_msg_create(message_data, config.msg_size, EMQ_ZEROCOPY_ON);
+
+		emq_msg_expire(message, config.expiration);
 
 		for (i = 0; i < msg; i++) {
 			emq_queue_push(client, QUEUE_NAME, message);
@@ -253,6 +257,7 @@ static int init_config(void)
 	config.clients = DEFAULT_CLIENTS;
 	config.messages = DEFAULT_MESSAGES;
 	config.msg_size = DEFAULT_MSG_SIZE;
+	config.expiration = DEFAULT_EXPIRATION_TIME;
 	config.noack = 0;
 }
 
@@ -269,10 +274,11 @@ static void usage(void)
 			"-c <clients> - number of parallel connections (default: %d)\n"
 			"-m <messages> - number of messages for all connections (default: %d)\n"
 			"-s <message size> - size of one message (default: %d)\n"
+			"-e <expiration time> - time of message expiration (default: %d ms)\n"
 			"--noack - enable noack mode\n"
-			"-h - show this message and exit\n",
+			"-h or --help - show this message and exit\n",
 				DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER_NAME, DEFAULT_USER_PASSWORD,
-				DEFAULT_CLIENTS, DEFAULT_MESSAGES, DEFAULT_MSG_SIZE);
+				DEFAULT_CLIENTS, DEFAULT_MESSAGES, DEFAULT_MSG_SIZE, DEFAULT_EXPIRATION_TIME);
 }
 
 static void parse_args(int argc, char *argv[])
@@ -299,9 +305,11 @@ static void parse_args(int argc, char *argv[])
 			config.messages = atoi(argv[i + 1]);
 		} else if (!strcmp(argv[i], "-s") && !last_arg) {
 			config.msg_size = atoi(argv[i + 1]);
+		} else if (!strcmp(argv[i], "-e") && !last_arg) {
+			config.expiration = atoi(argv[i + 1]);
 		} else if (!strcmp(argv[i], "--noack")) {
 			config.noack = 1;
-		} else if (!strcmp(argv[i], "-h")) {
+		} else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
 			usage();
 			exit(0);
 		}
