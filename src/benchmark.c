@@ -95,8 +95,13 @@ static void *worker(void *data)
 
 		emq_msg_expire(message, config.expiration);
 
-		for (i = 0; i < msg; i++) {
-			emq_queue_push(client, QUEUE_NAME, message);
+		for (i = 0; i < msg; i++)
+		{
+			if (emq_queue_push(client, QUEUE_NAME, message) != EMQ_STATUS_OK)
+			{
+				printf("Error push message to the queue: %s\n", emq_last_error(client));
+				return;
+			}
 		}
 
 		emq_msg_release(message);
