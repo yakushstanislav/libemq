@@ -37,7 +37,7 @@ int emq_check_response_header(protocol_response_header *header, uint8_t cmd, uin
 
 int emq_check_response_header_mini(protocol_response_header *header, uint8_t cmd);
 
-int emq_check_event_header(protocol_event_header *header, uint8_t cmd, uint8_t type1, uint8_t type2);
+int emq_check_event_header(protocol_event_header *header, uint8_t type1, uint8_t type2);
 
 int emq_check_status(protocol_response_header *header, uint8_t status);
 int emq_get_error(protocol_response_header *header);
@@ -78,5 +78,16 @@ int emq_route_bind_request(emq_client *client, const char *name, const char *que
 int emq_route_unbind_request(emq_client *client, const char *name, const char *queue, const char *key);
 int emq_route_push_request(emq_client *client, const char *name, const char *key, uint32_t msg_size);
 int emq_route_delete_request(emq_client *client, const char *name);
+
+int emq_channel_create_request(emq_client *client, const char *name, uint32_t flags);
+int emq_channel_exist_request(emq_client *client, const char *name);
+int emq_channel_list_request(emq_client *client);
+int emq_channel_rename_request(emq_client *client, const char *from, const char *to);
+int emq_channel_publish_request(emq_client *client, const char *name, const char *topic, uint32_t msg_size);
+int emq_channel_subscribe_request(emq_client *client, const char *name, const char *topic);
+int emq_channel_psubscribe_request(emq_client *client, const char *name, const char *pattern);
+int emq_channel_unsubscribe_request(emq_client *client, const char *name, const char *topic);
+int emq_channel_punsubscribe_request(emq_client *client, const char *name, const char *pattern);
+int emq_channel_delete_request(emq_client *client, const char *name);
 
 #endif

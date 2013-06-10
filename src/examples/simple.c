@@ -53,6 +53,7 @@ static void basic(emq_client *client)
 	printf("Users: %d\n", stat.users);
 	printf("Queues: %d\n", stat.queues);
 	printf("Routes: %d\n", stat.routes);
+	printf("Channels: %d\n", stat.channels);
 }
 
 /* Example user management */
@@ -396,6 +397,61 @@ static void route_management(emq_client *client)
 	CHECK_STATUS("Queue delete", status);
 }
 
+/* Example channel management */
+static void channel_management(emq_client *client)
+{
+	emq_list *channels; /* channels */
+	emq_channel *channel; /* channel */
+	emq_list_iterator iter; /* list iterator */
+	emq_list_node *node; /* list node */
+	int messages;
+	int status;
+
+	/* Create channel with name ".channel_1" */
+	status = emq_channel_create(client, ".channel_1", EMQ_CHANNEL_NONE);
+	CHECK_STATUS("Channel create", status);
+
+	/* Create channel with name ".channel_2" */
+	status = emq_channel_create(client, ".channel_2", EMQ_CHANNEL_NONE);
+	CHECK_STATUS("Channel create", status);
+
+	/* Check on exist channel with name ".channel_1" */
+	status = emq_channel_exist(client, ".channel_1");
+	printf(YELLOW("[Success]") " Channel \".channel_1\" exist: %d\n", status);
+
+	/* Check on exist channel with name "not-exist-channel" */
+	status = emq_channel_exist(client, "not-exist-channel");
+	printf(YELLOW("[Success]") " Channel \"not-exist-channel\" exist: %d\n", status);
+
+	/* Request the channel list */
+	channels = emq_channel_list(client);
+	printf(YELLOW("[Channel list]\n"));
+	if (channels != NULL) {
+		/* Enumeration of all channels */
+		emq_list_rewind(channels, &iter);
+		while ((node = emq_list_next(&iter)) != NULL)
+		{
+			channel = EMQ_LIST_VALUE(node);
+			printf("Name: %s\n", channel->name);
+			printf("Flags: %d\n", channel->flags);
+			printf("Topics: %d\n", channel->topics);
+			printf("Patterns: %d\n", channel->patterns);
+			printf("-----------------------\n");
+		}
+		emq_list_release(channels);
+	} else {
+		printf(RED("[Error]") " emq_channel_list(%s)\n", EMQ_GET_ERROR(client));
+	}
+
+	/* Delete channel with name ".channel_1" */
+	status = emq_channel_delete(client, ".channel_1");
+	CHECK_STATUS("Channel delete", status);
+
+	/* Delete channel with name ".channel_2" */
+	status = emq_channel_delete(client, ".channel_2");
+	CHECK_STATUS("Channel delete", status);
+}
+
 int main(int argc, char *argv[])
 {
 	/* Connect to server */
@@ -414,9 +470,10 @@ int main(int argc, char *argv[])
 		user_management(client);
 		queue_management(client);
 		route_management(client);
+		channel_management(client);
 
-		/* Delete all users and queues (you can use EMQ_FLUSH_ALL) */
-		status = emq_flush(client, EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE | EMQ_FLUSH_ROUTE);
+		/* Delete all users, queues, routes and channels (you can use EMQ_FLUSH_ALL) */
+		status = emq_flush(client, EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE | EMQ_FLUSH_ROUTE | EMQ_FLUSH_CHANNEL);
 		CHECK_STATUS("Flush all data", status);
 
 		/* Disconnect from server */

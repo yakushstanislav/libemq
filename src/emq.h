@@ -81,10 +81,22 @@
 #define EMQ_ROUTE_PUSH_PERM 2199023255552
 #define EMQ_ROUTE_DELETE_PERM 4398046511104
 
+#define EMQ_CHANNEL_CREATE_PERM 8796093022208
+#define EMQ_CHANNEL_EXIST_PERM 17592186044416
+#define EMQ_CHANNEL_LIST_PERM 35184372088832
+#define EMQ_CHANNEL_RENAME_PERM 70368744177664
+#define EMQ_CHANNEL_PUBLISH_PERM 140737488355328
+#define EMQ_CHANNEL_SUBSCRIBE_PERM 281474976710656
+#define EMQ_CHANNEL_PSUBSCRIBE_PERM 562949953421312
+#define EMQ_CHANNEL_UNSUBSCRIBE_PERM 1125899906842624
+#define EMQ_CHANNEL_PUNSUBSCRIBE_PERM 2251799813685248
+#define EMQ_CHANNEL_DELETE_PERM 4503599627370496
+
 #define EMQ_FLUSH_USER 1
 #define EMQ_FLUSH_QUEUE 2
 #define EMQ_FLUSH_ROUTE 4
-#define EMQ_FLUSH_ALL (EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE | EMQ_FLUSH_ROUTE)
+#define EMQ_FLUSH_CHANNEL 8
+#define EMQ_FLUSH_ALL (EMQ_FLUSH_USER | EMQ_FLUSH_QUEUE | EMQ_FLUSH_ROUTE | EMQ_FLUSH_CHANNEL)
 
 #define EMQ_QUEUE_NONE 0
 #define EMQ_QUEUE_AUTODELETE 1
@@ -99,6 +111,14 @@
 #define EMQ_ROUTE_AUTODELETE 1
 #define EMQ_ROUTE_ROUND_ROBIN 2
 #define EMQ_ROUTE_DURABLE 4
+
+#define EMQ_CHANNEL_NONE 0
+#define EMQ_CHANNEL_AUTODELETE 1
+#define EMQ_CHANNEL_ROUND_ROBIN 2
+#define EMQ_CHANNEL_DURABLE 4
+
+#define EMQ_CALLBACK_QUEUE 1
+#define EMQ_CALLBACK_CHANNEL 2
 
 #define EMQ_MAX_MSG 4294967295
 #define EMQ_MAX_MSG_SIZE 2147483647
@@ -149,7 +169,8 @@ typedef struct emq_client {
 	size_t pos;
 	int noack;
 	int fd;
-	emq_list *subscriptions;
+	emq_list *queue_subscriptions;
+	emq_list *channel_subscriptions;
 } emq_client;
 
 typedef uint64_t emq_perm;
@@ -183,6 +204,13 @@ typedef struct emq_route_key {
 	char queue[64];
 } emq_route_key;
 
+typedef struct emq_channel {
+	char name[64];
+	uint32_t flags;
+	uint32_t topics;
+	uint32_t patterns;
+} emq_channel;
+
 typedef struct emq_msg {
 	void *data;
 	size_t size;
@@ -191,7 +219,8 @@ typedef struct emq_msg {
 	int zero_copy;
 } emq_msg;
 
-typedef int emq_msg_callback(emq_client *client, const char *name, emq_msg *msg);
+typedef int emq_msg_callback(emq_client *client, int type, const char *name,
+	const char *topic, const char *pattern, emq_msg *msg);
 
 #pragma pack(push, 1)
 
@@ -211,7 +240,7 @@ typedef struct emq_status {
 	uint32_t users;
 	uint32_t queues;
 	uint32_t routes;
-	uint32_t resv2;
+	uint32_t channels;
 	uint32_t resv3;
 	uint32_t resv4;
 } emq_status;
@@ -266,6 +295,17 @@ int emq_route_bind(emq_client *client, const char *name, const char *queue, cons
 int emq_route_unbind(emq_client *client, const char *name, const char *queue, const char *key);
 int emq_route_push(emq_client *client, const char *name, const char *key, emq_msg *msg);
 int emq_route_delete(emq_client *client, const char *name);
+
+int emq_channel_create(emq_client *client, const char *name, uint32_t flags);
+int emq_channel_exist(emq_client *client, const char *name);
+emq_list *emq_channel_list(emq_client *client);
+int emq_channel_rename(emq_client *client, const char *from, const char *to);
+int emq_channel_publish(emq_client *client, const char *name, const char *topic, emq_msg *msg);
+int emq_channel_subscribe(emq_client *client, const char *name, const char *topic, emq_msg_callback *callback);
+int emq_channel_psubscribe(emq_client *client, const char *name, const char *pattern, emq_msg_callback *callback);
+int emq_channel_unsubscribe(emq_client *client, const char *name, const char *topic);
+int emq_channel_punsubscribe(emq_client *client, const char *name, const char *pattern);
+int emq_channel_delete(emq_client *client, const char *name);
 
 void emq_noack_enable(emq_client *client);
 void emq_noack_disable(emq_client *client);

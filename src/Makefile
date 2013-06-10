@@ -9,8 +9,10 @@ DEBUG?=-g -ggdb
 COMPILE_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG)
 COMPILE_LDFLAGS=$(LDFLAGS)
 
+EXAMPLES_DIR=examples
+
 OBJ=emq.o network.o packet.o
-BINS=example example-subscribe benchmark
+BINS=example-simple example-queue-subscribe example-channel-subscribe benchmark
 
 DYNAMIC_LIB_SUFFIX=so
 STATIC_LIB_SUFFIX=a
@@ -23,14 +25,6 @@ STATIC_LIB_MAKE_CMD=ar rcs $(STATIC_LIB_NAME)
 
 all: $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) $(BINS)
 
-# make dep
-benchmark.o: benchmark.c emq.h
-emq.o: emq.c emq.h network.h protocol.h packet.h
-example-subscribe.o: example-subscribe.c emq.h
-example.o: example.c emq.h
-network.o: network.c fmacros.h emq.h network.h
-packet.o: packet.c emq.h packet.h protocol.h
-
 $(DYNAMIC_LIB_NAME): $(OBJ)
 	$(DYNAMIC_LIB_MAKE_CMD) $(OBJ)
 
@@ -40,11 +34,14 @@ $(STATIC_LIB_NAME): $(OBJ)
 dynamic: $(DYNAMIC_LIB_NAME)
 static: $(STATIC_LIB_NAME)
 
-example: $(STATIC_LIB_NAME)
-	$(CC) -o $@ $(COMPILE_LDFLAGS) example.c $(STATIC_LIB_NAME)
+example-simple: $(STATIC_LIB_NAME)
+	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/simple.c -I. $(STATIC_LIB_NAME)
 
-example-subscribe: $(STATIC_LIB_NAME)
-	$(CC) -o $@ $(COMPILE_LDFLAGS) example-subscribe.c $(STATIC_LIB_NAME) -lpthread
+example-queue-subscribe: $(STATIC_LIB_NAME)
+	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/queue-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
+
+example-channel-subscribe: $(STATIC_LIB_NAME)
+	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/channel-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
 
 benchmark: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) benchmark.c $(STATIC_LIB_NAME) -lpthread

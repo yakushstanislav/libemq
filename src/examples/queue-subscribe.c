@@ -57,7 +57,8 @@ void *worker(void *data)
 	pthread_exit(NULL);
 }
 
-int queue_message_callback(emq_client *client, const char *name, emq_msg *msg)
+int queue_message_callback(emq_client *client, int type, const char *name,
+	const char *topic, const char *pattern, emq_msg *msg)
 {
 	printf(YELLOW("[Success]") " [Event] Message \'%s\' in queue %s\n", (char*)emq_msg_data(msg), name);
 

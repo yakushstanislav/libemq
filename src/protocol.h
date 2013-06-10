@@ -77,7 +77,19 @@ typedef enum protocol_command {
 	EMQ_PROTOCOL_CMD_ROUTE_BIND = 0x36,
 	EMQ_PROTOCOL_CMD_ROUTE_UNBIND = 0x37,
 	EMQ_PROTOCOL_CMD_ROUTE_PUSH = 0x38,
-	EMQ_PROTOCOL_CMD_ROUTE_DELETE = 0x39
+	EMQ_PROTOCOL_CMD_ROUTE_DELETE = 0x39,
+
+	/* channel commands (58..67) */
+	EMQ_PROTOCOL_CMD_CHANNEL_CREATE = 0x3A,
+	EMQ_PROTOCOL_CMD_CHANNEL_EXIST = 0x3B,
+	EMQ_PROTOCOL_CMD_CHANNEL_LIST = 0x3C,
+	EMQ_PROTOCOL_CMD_CHANNEL_RENAME = 0x3D,
+	EMQ_PROTOCOL_CMD_CHANNEL_PUBLISH = 0x3E,
+	EMQ_PROTOCOL_CMD_CHANNEL_SUBSCRIBE = 0x3F,
+	EMQ_PROTOCOL_CMD_CHANNEL_PSUBSCRIBE = 0x40,
+	EMQ_PROTOCOL_CMD_CHANNEL_UNSUBSCRIBE = 0x41,
+	EMQ_PROTOCOL_CMD_CHANNEL_PUNSUBSCRIBE = 0x42,
+	EMQ_PROTOCOL_CMD_CHANNEL_DELETE = 0x43
 } protocol_command;
 
 typedef enum protocol_response_status {
@@ -347,6 +359,78 @@ typedef struct protocol_request_route_delete {
 	} body;
 } protocol_request_route_delete;
 
+typedef struct protocol_request_channel_create {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		uint32_t flags;
+	} body;
+} protocol_request_channel_create;
+
+typedef struct protocol_request_channel_exist {
+	protocol_request_header header;
+	struct {
+		char name[64];
+	} body;
+} protocol_request_channel_exist;
+
+typedef struct protocol_request_header protocol_request_channel_list;
+
+typedef struct protocol_request_channel_rename {
+	protocol_request_header header;
+	struct {
+		char from[64];
+		char to[64];
+	} body;
+} protocol_request_channel_rename;
+
+typedef struct protocol_request_channel_publish {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char topic[32];
+	} body;
+} protocol_request_channel_publish;
+
+typedef struct protocol_request_channel_subscribe {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char topic[32];
+	} body;
+} protocol_request_channel_subscribe;
+
+typedef struct protocol_request_channel_psubscribe {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char pattern[32];
+	} body;
+} protocol_request_channel_psubscribe;
+
+typedef struct protocol_request_channel_unsubscribe {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char topic[32];
+	} body;
+} protocol_request_channel_unsubscribe;
+
+typedef struct protocol_request_channel_punsubscribe {
+	protocol_request_header header;
+	struct {
+		char name[64];
+		char pattern[32];
+	} body;
+} protocol_request_channel_punsubscribe;
+
+typedef struct protocol_request_channel_delete {
+	protocol_request_header header;
+	struct {
+		char name[64];
+	} body;
+} protocol_request_channel_delete;
+
 typedef struct protocol_response_stat {
 	protocol_response_header header;
 	struct {
@@ -364,8 +448,8 @@ typedef struct protocol_response_stat {
 		uint32_t clients;
 		uint32_t users;
 		uint32_t queues;
-		uint32_t resv1;
-		uint32_t resv2;
+		uint32_t routes;
+		uint32_t channels;
 		uint32_t resv3;
 		uint32_t resv4;
 	} body;
@@ -391,6 +475,13 @@ typedef struct protocol_response_route_exist {
 		uint32_t status;
 	} body;
 } protocol_response_route_exist;
+
+typedef struct protocol_response_channel_exist {
+	protocol_response_header header;
+	struct {
+		uint32_t status;
+	} body;
+} protocol_response_channel_exist;
 
 #pragma pack(pop)
 

@@ -56,14 +56,21 @@ static const char *emq_error_array[] = {
 	"No data"
 };
 
-typedef struct emq_subscription {
+typedef struct emq_queue_subscription {
 	char name[64];
 	emq_msg_callback *callback;
-} emq_subscription;
+} emq_queue_subscription;
+
+typedef struct emq_channel_subscription {
+	char name[64];
+	char channel[32];
+	emq_msg_callback *callback;
+} emq_channel_subscription;
 
 static emq_list *emq_list_init(void);
 static int emq_list_add_value(emq_list *list, void *value);
-static void emq_subscription_list_free_handler(void *value);
+static void emq_queue_subscription_list_free_handler(void *value);
+static void emq_channel_subscription_list_free_handler(void *value);
 
 static emq_client *emq_client_init(void)
 {
@@ -85,26 +92,35 @@ static emq_client *emq_client_init(void)
 	client->pos = 0;
 	client->noack = 0;
 	client->fd = 0;
-	client->subscriptions = emq_list_init();
+	client->queue_subscriptions = emq_list_init();
+	client->channel_subscriptions = emq_list_init();
 
 	if (!client->request) {
 		free(client);
 		return NULL;
 	}
 
-	if (!client->subscriptions) {
+	if (!client->queue_subscriptions) {
 		free(client->request);
 		free(client);
 	}
 
-	EMQ_LIST_SET_FREE_METHOD(client->subscriptions, emq_subscription_list_free_handler);
+	if (!client->channel_subscriptions) {
+		emq_list_release(client->queue_subscriptions);
+		free(client->request);
+		free(client);
+	}
+
+	EMQ_LIST_SET_FREE_METHOD(client->queue_subscriptions, emq_queue_subscription_list_free_handler);
+	EMQ_LIST_SET_FREE_METHOD(client->channel_subscriptions, emq_channel_subscription_list_free_handler);
 
 	return client;
 }
 
 static void emq_client_release(emq_client *client)
 {
-	emq_list_release(client->subscriptions);
+	emq_list_release(client->queue_subscriptions);
+	emq_list_release(client->channel_subscriptions);
 	free(client->request);
 	free(client);
 }
@@ -269,6 +285,23 @@ static void emq_route_release(emq_route *route)
 	free(route);
 }
 
+static emq_channel *emq_channel_init(void)
+{
+	emq_channel *channel;
+
+	channel = (emq_channel*)calloc(1, sizeof(*channel));
+	if (!channel) {
+		return NULL;
+	}
+
+	return channel;
+}
+
+static void emq_channel_release(emq_channel *channel)
+{
+	free(channel);
+}
+
 static emq_route_key *emq_route_key_init(void)
 {
 	emq_route_key *route_key;
@@ -286,11 +319,11 @@ static void emq_route_key_release(emq_route_key *route_key)
 	free(route_key);
 }
 
-static emq_subscription *emq_subscription_create(const char *name, emq_msg_callback *callback)
+static emq_queue_subscription *emq_queue_subscription_create(const char *name, emq_msg_callback *callback)
 {
-	emq_subscription *subscription;
+	emq_queue_subscription *subscription;
 
-	subscription = (emq_subscription*)malloc(sizeof(*subscription));
+	subscription = (emq_queue_subscription*)malloc(sizeof(*subscription));
 	if (!subscription) {
 		return NULL;
 	}
@@ -303,7 +336,30 @@ static emq_subscription *emq_subscription_create(const char *name, emq_msg_callb
 	return subscription;
 }
 
-static void emq_subscription_release(emq_subscription *subscription)
+static void emq_queue_subscription_release(emq_queue_subscription *subscription)
+{
+	free(subscription);
+}
+
+static emq_channel_subscription *emq_channel_subscription_create(const char *name, const char *data, emq_msg_callback *callback)
+{
+	emq_channel_subscription *subscription;
+
+	subscription = (emq_channel_subscription*)malloc(sizeof(*subscription));
+	if (!subscription) {
+		return NULL;
+	}
+
+	memset(subscription, 0, sizeof(*subscription));
+
+	memcpy(subscription->name, name, strlenz(name));
+	memcpy(subscription->channel, data, strlenz(data));
+	subscription->callback = callback;
+
+	return subscription;
+}
+
+static void emq_channel_subscription_release(emq_channel_subscription *subscription)
 {
 	free(subscription);
 }
@@ -323,14 +379,24 @@ static void emq_route_list_free_handler(void *value)
 	emq_route_release(value);
 }
 
+static void emq_channel_list_free_handler(void *value)
+{
+	emq_channel_release(value);
+}
+
 static void emq_route_key_list_free_handler(void *value)
 {
 	emq_route_key_release(value);
 }
 
-static void emq_subscription_list_free_handler(void *value)
+static void emq_queue_subscription_list_free_handler(void *value)
 {
-	emq_subscription_release(value);
+	emq_queue_subscription_release(value);
+}
+
+static void emq_channel_subscription_list_free_handler(void *value)
+{
+	emq_channel_subscription_release(value);
 }
 
 emq_msg *emq_msg_create(void *data, size_t size, int zero_copy)
@@ -1464,7 +1530,7 @@ error:
 int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, emq_msg_callback *callback)
 {
 	protocol_response_header header;
-	emq_subscription *subscription;
+	emq_queue_subscription *subscription;
 
 	EMQ_CLEAR_ERROR(client);
 
@@ -1501,13 +1567,13 @@ int emq_queue_subscribe(emq_client *client, const char *name, uint32_t flags, em
 		}
 	}
 
-	subscription = emq_subscription_create(name, callback);
+	subscription = emq_queue_subscription_create(name, callback);
 	if (!subscription) {
 		emq_client_set_error(client, EMQ_ERROR_ALLOC);
 		goto error;
 	}
 
-	emq_list_add_value(client->subscriptions, subscription);
+	emq_list_add_value(client->queue_subscriptions, subscription);
 
 	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
 	return EMQ_STATUS_OK;
@@ -1520,7 +1586,7 @@ error:
 int emq_queue_unsubscribe(emq_client *client, const char *name)
 {
 	protocol_response_header header;
-	emq_subscription *subscription;
+	emq_queue_subscription *subscription;
 	emq_list_iterator iter;
 	emq_list_node *node;
 
@@ -1554,12 +1620,12 @@ int emq_queue_unsubscribe(emq_client *client, const char *name)
 		}
 	}
 
-	emq_list_rewind(client->subscriptions, &iter);
+	emq_list_rewind(client->queue_subscriptions, &iter);
 	while ((node = emq_list_next(&iter)) != NULL)
 	{
 		subscription = EMQ_LIST_VALUE(node);
 		if (!strcmp(subscription->name, name)) {
-			emq_list_delete_node(client->subscriptions, node);
+			emq_list_delete_node(client->queue_subscriptions, node);
 		}
 	}
 
@@ -2135,6 +2201,539 @@ error:
 	return EMQ_STATUS_ERR;
 }
 
+int emq_channel_create(emq_client *client, const char *name, uint32_t flags)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_create_request(client, name, flags) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_CREATE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_exist(emq_client *client, const char *name)
+{
+	protocol_response_channel_exist response;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_exist_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (emq_client_read(client, (char*)&response.header, sizeof(response.header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		goto error;
+	}
+
+	if (emq_check_response_header(&response.header, EMQ_PROTOCOL_CMD_CHANNEL_EXIST,
+			sizeof(response.body)) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+		goto error;
+	}
+
+	if (emq_check_status(&response.header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, emq_get_error(&response.header));
+		goto error;
+	}
+
+	if (emq_client_read(client, (char*)&response.body, sizeof(response.body)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		goto error;
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return response.body.status;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return 0;
+}
+
+emq_list *emq_channel_list(emq_client *client)
+{
+	protocol_response_header header;
+	emq_channel *channel;
+	emq_list *list;
+	char *buffer;
+	uint32_t i;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_list_request(client) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		goto error;
+	}
+
+	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_CHANNEL_LIST) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+		goto error;
+	}
+
+	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, emq_get_error(&header));
+		goto error;
+	}
+
+	buffer = (char*)malloc(header.bodylen);
+	if (!buffer) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
+		goto error;
+	}
+
+	if (emq_client_read(client, buffer, header.bodylen) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		free(buffer);
+		goto error;
+	}
+
+	list = emq_list_init();
+	if (!list) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
+		free(buffer);
+		goto error;
+	}
+
+	EMQ_LIST_SET_FREE_METHOD(list, emq_channel_list_free_handler);
+
+	for (i = 0; i < header.bodylen;)
+	{
+		channel = emq_channel_init();
+		if (!channel) {
+			emq_client_set_error(client, EMQ_ERROR_ALLOC);
+			emq_list_release(list);
+			free(buffer);
+			goto error;
+		}
+
+		memcpy(channel->name, buffer + i, 64);
+		i += 64;
+		memcpy(&channel->flags, buffer + i, sizeof(uint32_t));
+		i += sizeof(uint32_t);
+		memcpy(&channel->topics, buffer + i, sizeof(uint32_t));
+		i += sizeof(uint32_t);
+		memcpy(&channel->patterns, buffer + i, sizeof(uint32_t));
+		i += sizeof(uint32_t);
+
+		emq_list_add_value(list, channel);
+	}
+
+	free(buffer);
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return list;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return NULL;
+
+}
+
+int emq_channel_rename(emq_client *client, const char *from, const char *to)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_rename_request(client, from, to) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_RENAME, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_publish(emq_client *client, const char *name, const char *topic, emq_msg *msg)
+{
+	protocol_response_header header;
+	struct iovec data[2];
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (msg->size < 1) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_channel_publish_request(client, name, topic, msg->size) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	data[0].iov_base = client->request;
+	data[0].iov_len = client->pos;
+	data[1].iov_base = msg->data;
+	data[1].iov_len = msg->size;
+
+	if (emq_client_writev(client, data, 2) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_PUBLISH, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_subscribe(emq_client *client, const char *name, const char *topic, emq_msg_callback *callback)
+{
+	protocol_response_header header;
+	emq_channel_subscription *subscription;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (!callback) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_channel_subscribe_request(client, name, topic) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_SUBSCRIBE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	subscription = emq_channel_subscription_create(name, topic, callback);
+	if (!subscription) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
+		goto error;
+	}
+
+	emq_list_add_value(client->channel_subscriptions, subscription);
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_psubscribe(emq_client *client, const char *name, const char *pattern, emq_msg_callback *callback)
+{
+	protocol_response_header header;
+	emq_channel_subscription *subscription;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (!callback) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_channel_psubscribe_request(client, name, pattern) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_PSUBSCRIBE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	subscription = emq_channel_subscription_create(name, pattern, callback);
+	if (!subscription) {
+		emq_client_set_error(client, EMQ_ERROR_ALLOC);
+		goto error;
+	}
+
+	emq_list_add_value(client->channel_subscriptions, subscription);
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_unsubscribe(emq_client *client, const char *name, const char *topic)
+{
+	protocol_response_header header;
+	emq_channel_subscription *subscription;
+	emq_list_iterator iter;
+	emq_list_node *node;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_unsubscribe_request(client, name, topic) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_UNSUBSCRIBE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	emq_list_rewind(client->channel_subscriptions, &iter);
+	while ((node = emq_list_next(&iter)) != NULL)
+	{
+		subscription = EMQ_LIST_VALUE(node);
+		if (!strcmp(subscription->name, name)) {
+			emq_list_delete_node(client->channel_subscriptions, node);
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_punsubscribe(emq_client *client, const char *name, const char *pattern)
+{
+	protocol_response_header header;
+	emq_channel_subscription *subscription;
+	emq_list_iterator iter;
+	emq_list_node *node;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_punsubscribe_request(client, name, pattern) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_UNSUBSCRIBE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	emq_list_rewind(client->channel_subscriptions, &iter);
+	while ((node = emq_list_next(&iter)) != NULL)
+	{
+		subscription = EMQ_LIST_VALUE(node);
+		if (!strcmp(subscription->name, name)) {
+			emq_list_delete_node(client->channel_subscriptions, node);
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
+int emq_channel_delete(emq_client *client, const char *name)
+{
+	protocol_response_header header;
+
+	EMQ_CLEAR_ERROR(client);
+
+	if (emq_channel_delete_request(client, name) == EMQ_STATUS_ERR) {
+		emq_client_set_error(client, EMQ_ERROR_DATA);
+		goto error;
+	}
+
+	if (emq_client_write(client, client->request, client->pos) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_WRITE);
+		goto error;
+	}
+
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
+
+		if (emq_check_response_header(&header, EMQ_PROTOCOL_CMD_CHANNEL_DELETE, 0) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
+
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
+	}
+
+	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
+	return EMQ_STATUS_OK;
+
+error:
+	EMQ_SET_STATUS(client, EMQ_STATUS_ERR);
+	return EMQ_STATUS_ERR;
+}
+
 void emq_noack_enable(emq_client *client)
 {
 	client->noack = 1;
@@ -2145,63 +2744,152 @@ void emq_noack_disable(emq_client *client)
 	client->noack = 0;
 }
 
+static int emq_queue_process(emq_client *client, protocol_event_header *header)
+{
+	emq_queue_subscription *subscription;
+	emq_list_iterator iter;
+	emq_list_node *node;
+	emq_msg *msg = NULL;
+	char name[64];
+	int found = 0;
+
+	if (emq_client_read(client, name, sizeof(name)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		return -1;
+	}
+
+	emq_list_rewind(client->queue_subscriptions, &iter);
+	while ((node = emq_list_next(&iter)) != NULL)
+	{
+		subscription = EMQ_LIST_VALUE(node);
+		if (!strcmp(subscription->name, name)) {
+			found = 1;
+			break;
+		}
+	}
+
+	if (!found) {
+		return -1;
+	}
+
+	if (header->type == EMQ_PROTOCOL_EVENT_MESSAGE) {
+		if ((msg = emq_read_message(client, header->bodylen - 64)) == NULL) {
+			return -1;
+		}
+	}
+
+	if (subscription->callback(client, EMQ_CALLBACK_QUEUE, subscription->name, NULL, NULL, msg) &&
+		client->queue_subscriptions->length == 0) {
+		return 1;
+	}
+
+	return 0;
+}
+
+int emq_channel_process(emq_client *client, protocol_event_header *header, int extended)
+{
+	emq_channel_subscription *subscription;
+	emq_list_iterator iter;
+	emq_list_node *node;
+	emq_msg *msg = NULL;
+	char name[64];
+	char topic[32];
+	char pattern[32];
+	int found = 0;
+
+	if (emq_client_read(client, name, sizeof(name)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		return -1;
+	}
+
+	if (emq_client_read(client, topic, sizeof(topic)) == -1) {
+		emq_client_set_error(client, EMQ_ERROR_READ);
+		return -1;
+	}
+
+	if (extended)
+	{
+		if (emq_client_read(client, pattern, sizeof(pattern)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			return -1;
+		}
+	}
+
+	emq_list_rewind(client->channel_subscriptions, &iter);
+	while ((node = emq_list_next(&iter)) != NULL)
+	{
+		subscription = EMQ_LIST_VALUE(node);
+		if (!strcmp(subscription->name, name)) {
+			found = 1;
+			break;
+		}
+	}
+
+	if (!found) {
+		return -1;
+	}
+
+	if ((msg = emq_read_message(client, header->bodylen - (extended ? 128 : 96))) == NULL) {
+		return -1;
+	}
+
+	if (subscription->callback(client, EMQ_CALLBACK_CHANNEL, subscription->name, topic,
+		(extended ? pattern : NULL), msg) && client->queue_subscriptions->length == 0) {
+		return 1;
+	}
+
+	return 0;
+}
+
 int emq_process(emq_client *client)
 {
 	protocol_event_header header;
-	emq_subscription *subscription = NULL;
-	emq_list_iterator iter;
-	emq_list_node *node;
-	emq_msg *msg;
-	char name[64];
-	int found;
+	int status = 0;
 
 	EMQ_CLEAR_ERROR(client);
 
 	for (;;)
 	{
-		found = 0;
-
 		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
 			emq_client_set_error(client, EMQ_ERROR_READ);
 			goto error;
 		}
 
-		if (emq_check_event_header(&header, EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE,
-			EMQ_PROTOCOL_EVENT_NOTIFY, EMQ_PROTOCOL_EVENT_MESSAGE) == EMQ_STATUS_ERR) {
+		if (emq_check_event_header(&header, EMQ_PROTOCOL_EVENT_NOTIFY, EMQ_PROTOCOL_EVENT_MESSAGE) == EMQ_STATUS_ERR) {
 			emq_client_set_error(client, EMQ_ERROR_READ);
 			goto error;
 		}
 
-		if (emq_client_read(client, name, sizeof(name)) == -1) {
-			emq_client_set_error(client, EMQ_ERROR_READ);
-			goto error;
-		}
-
-		emq_list_rewind(client->subscriptions, &iter);
-		while ((node = emq_list_next(&iter)) != NULL)
+		if (header.cmd != EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE &&
+			header.cmd != EMQ_PROTOCOL_CMD_CHANNEL_SUBSCRIBE &&
+			header.cmd != EMQ_PROTOCOL_CMD_CHANNEL_PSUBSCRIBE)
 		{
-			subscription = EMQ_LIST_VALUE(node);
-			if (!strcmp(subscription->name, name)) {
-				found = 1;
-				break;
-			}
-		}
-
-		if (!found) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
 			goto error;
 		}
 
-		msg = NULL;
-		if (header.type == EMQ_PROTOCOL_EVENT_MESSAGE) {
-			if ((msg = emq_read_message(client, header.bodylen - 64)) == NULL) {
-				goto error;
-			}
+		switch (header.cmd)
+		{
+			case EMQ_PROTOCOL_CMD_QUEUE_SUBSCRIBE:
+				status = emq_queue_process(client, &header);
+				break;
+			case EMQ_PROTOCOL_CMD_CHANNEL_SUBSCRIBE:
+				status = emq_channel_process(client, &header, 0);
+				break;
+			case EMQ_PROTOCOL_CMD_CHANNEL_PSUBSCRIBE:
+				status = emq_channel_process(client, &header, 1);
+				break;
 		}
 
-		if (subscription->callback(client, subscription->name, msg) &&
-			client->subscriptions->length == 0) {
-			break;
+		switch (status)
+		{
+			case 0: break;
+			case 1: goto stop;
+			case -1: goto error;
 		}
+
+		continue;
+		stop: break;
 	}
 
 	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
