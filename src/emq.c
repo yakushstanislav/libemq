@@ -2850,6 +2850,10 @@ int emq_process(emq_client *client)
 
 	for (;;)
 	{
+		if (!EMQ_LIST_LENGTH(client->queue_subscriptions) &&
+			!EMQ_LIST_LENGTH(client->channel_subscriptions))
+			break;
+
 		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
 			emq_client_set_error(client, EMQ_ERROR_READ);
 			goto error;
