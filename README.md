@@ -452,7 +452,7 @@ Deleting the data on the server.
 	<tr>
 		<td>2</td>
 		<td>flags</td>
-		<td>flags to delete the data from the server (EMQ_FLUSH_ALL, EMQ_FLUSH_USER, EMQ_FLUSH_QUEUE)</td>
+		<td>flags to delete the data from the server (EMQ_FLUSH_ALL, EMQ_FLUSH_USER, EMQ_FLUSH_QUEUE, EMQ_FLUSH_CHANNEL)</td>
 	</tr>
 </table>
 
@@ -638,153 +638,230 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
     </tr>
     <tr>
         <td>3</td>
+        <td>EMQ_CHANNEL_PERM</td>
+        <td>
+			 <i>.channel_create</i><br/>
+			 <i>.channel_exist</i><br/>
+			 <i>.channel_list</i><br/>
+			 <i>.channel_rename</i><br/>
+			 <i>.channel_publish</i><br/>
+			 <i>.channel_subscribe</i><br/>
+			 <i>.channel_psubscribe</i><br/>
+			 <i>.channel_unsubscribe</i><br/>
+			 <i>.channel_punsubscribe</i><br/>
+			 <i>.channel_delete</i><br/>
+		</td>
+        <td>The ability to perform all the commands associated with channel</td>
+    </tr>
+    <tr>
+        <td>4</td>
         <td>EMQ_ADMIN_PERM</td>
         <td>-</td>
         <td>The ability to perform all the commands on the server (including the commands for working with users)</td>
     </tr>
     <tr>
-        <td>4</td>
+        <td>5</td>
         <td>EMQ_NOT_CHANGE_PERM</td>
         <td>-</td>
         <td>If a user is created with the flag, then it can not be removed</td>
     </tr>
     <tr>
-        <td>5</td>
+        <td>6</td>
         <td>EMQ_QUEUE_CREATE_PERM</td>
         <td>.queue_create</td>
         <td>Permission to create queues</td>
     </tr>
     <tr>
-        <td>6</td>
+        <td>7</td>
         <td>EMQ_QUEUE_DECLARE_PERM</td>
         <td>.queue_declare</td>
         <td>Permission to declare the queue</td>
     </tr>
     <tr>
-        <td>7</td>
+        <td>8</td>
         <td>EMQ_QUEUE_EXIST_PERM</td>
         <td>.queue_exist</td>
         <td>Permission to check the existence of the queue</td>
     </tr>
     <tr>
-        <td>8</td>
+        <td>9</td>
         <td>EMQ_QUEUE_LIST_PERM</td>
         <td>.queue_list</td>
         <td>Permission to get a list of queues</td>
     </tr>
     <tr>
-        <td>9</td>
+        <td>10</td>
         <td>EMQ_QUEUE_RENAME_PERM</td>
         <td>.queue_rename</td>
         <td>Permission to rename the queue</td>
     </tr>
     <tr>
-        <td>10</td>
+        <td>11</td>
         <td>EMQ_QUEUE_SIZE_PERM</td>
         <td>.queue_size</td>
         <td>Permission to get the size of the queue</td>
     </tr>
     <tr>
-        <td>11</td>
+        <td>12</td>
         <td>EMQ_QUEUE_PUSH_PERM</td>
         <td>.queue_push</td>
         <td>Permission to push messages to the queue</td>
     </tr>
     <tr>
-        <td>12</td>
+        <td>13</td>
         <td>EMQ_QUEUE_GET_PERM</td>
         <td>.queue_get</td>
         <td>Permission to get messages from the queue</td>
     </tr>
     <tr>
-        <td>13</td>
+        <td>14</td>
         <td>EMQ_QUEUE_POP_PERM</td>
         <td>.queue_pop</td>
         <td>Permission to pop messages from the queue</td>
     </tr>
     <tr>
-        <td>14</td>
+        <td>15</td>
         <td>EMQ_QUEUE_CONFIRM_PERM</td>
         <td>.queue_confirm</td>
         <td>Permission to confirm delivery for the message</td>
     </tr>
     <tr>
-        <td>15</td>
+        <td>16</td>
         <td>EMQ_QUEUE_SUBSCRIBE_PERM</td>
         <td>.queue_subscribe</td>
         <td>Permission to subscribe to the queue</td>
     </tr>
     <tr>
-        <td>16</td>
+        <td>17</td>
         <td>EMQ_QUEUE_UNSUBSCRIBE_PERM</td>
         <td>.queue_unsubscribe</td>
-        <td>Permission to unsubscribe to the queue</td>
+        <td>Permission to unsubscribe from the queue</td>
     </tr>
     <tr>
-        <td>17</td>
+        <td>18</td>
         <td>EMQ_QUEUE_PURGE_PERM</td>
         <td>.queue_purge</td>
         <td>Permission to delete all messages from the queue</td>
     </tr>
     <tr>
-        <td>18</td>
+        <td>19</td>
         <td>EMQ_QUEUE_DELETE_PERM</td>
         <td>.queue_delete</td>
         <td>Permission to delete queue</td>
     </tr>
     <tr>
-        <td>19</td>
+        <td>20</td>
         <td>EMQ_ROUTE_CREATE_PERM</td>
         <td>.route_create</td>
         <td>Permission to create route</td>
     </tr>
     <tr>
-        <td>20</td>
+        <td>21</td>
         <td>EMQ_ROUTE_EXIST_PERM</td>
         <td>.route_exist</td>
         <td>Permission to check the existence of the route</td>
     </tr>
     <tr>
-        <td>21</td>
+        <td>22</td>
         <td>EMQ_ROUTE_LIST_PERM</td>
         <td>.route_list</td>
         <td>Permission to get a list of routes</td>
     </tr>
     <tr>
-        <td>22</td>
+        <td>23</td>
         <td>EMQ_ROUTE_KEYS_PERM</td>
         <td>.route_keys</td>
         <td>Permission to get a list of route keys</td>
     </tr>
     <tr>
-        <td>23</td>
+        <td>24</td>
         <td>EMQ_ROUTE_RENAME_PERM</td>
         <td>.route_rename</td>
         <td>Permission to rename the route</td>
     </tr>
     <tr>
-        <td>24</td>
+        <td>25</td>
         <td>EMQ_ROUTE_BIND_PERM</td>
         <td>.route_bind</td>
         <td>Permission to bind route with the queue</td>
     </tr>
     <tr>
-        <td>25</td>
+        <td>26</td>
         <td>EMQ_ROUTE_UNBIND_PERM</td>
         <td>.route_unbind</td>
         <td>Permission to unbind route from the queue</td>
     </tr>
     <tr>
-        <td>26</td>
+        <td>27</td>
         <td>EMQ_ROUTE_PUSH_PERM</td>
         <td>.route_push</td>
         <td>Permission to push messages to the route</td>
     </tr>
     <tr>
-        <td>27</td>
+        <td>28</td>
         <td>EMQ_ROUTE_DELETE_PERM</td>
         <td>.route_delete</td>
         <td>Permission to delete route</td>
+    </tr>
+    <tr>
+        <td>29</td>
+        <td>EMQ_CHANNEL_CREATE_PERM</td>
+        <td>.channel_create</td>
+        <td>Permission to create channel</td>
+    </tr>
+    <tr>
+        <td>30</td>
+        <td>EMQ_CHANNEL_EXIST_PERM</td>
+        <td>.channel_exist</td>
+        <td>Permission to check the existence of the channel</td>
+    </tr>
+    <tr>
+        <td>31</td>
+        <td>EMQ_CHANNEL_LIST_PERM</td>
+        <td>.channel_list</td>
+        <td>Permission to get a list of channels</td>
+    </tr>
+    <tr>
+        <td>32</td>
+        <td>EMQ_CHANNEL_RENAME_PERM</td>
+        <td>.channel_rename</td>
+        <td>Permission to rename the channel</td>
+    </tr>
+    <tr>
+        <td>33</td>
+        <td>EMQ_CHANNEL_PUBLISH_PERM</td>
+        <td>.channel_publish</td>
+        <td>Permission to publish message to the channel</td>
+    </tr>
+    <tr>
+        <td>34</td>
+        <td>EMQ_CHANNEL_SUBSCRIBE_PERM</td>
+        <td>.channel_subscribe</td>
+        <td>Permission to subscribe to the channel by topic</td>
+    </tr>
+    <tr>
+        <td>35</td>
+        <td>EMQ_CHANNEL_PSUBSCRIBE_PERM</td>
+        <td>.channel_psubscribe</td>
+        <td>Permission to subscribe to the channel by pattern</td>
+    </tr>
+    <tr>
+        <td>36</td>
+        <td>EMQ_CHANNEL_UNSUBSCRIBE_PERM</td>
+        <td>.channel_unsubscribe</td>
+        <td>Permission to unsubscribe from channel by topic</td>
+    </tr>
+    <tr>
+        <td>37</td>
+        <td>EMQ_CHANNEL_PUNSUBSCRIBE_PERM</td>
+        <td>.channel_punsubscribe</td>
+        <td>Permission to unsubscribe from channel by pattern</td>
+    </tr>
+    <tr>
+        <td>38</td>
+        <td>EMQ_CHANNEL_DELETE_PERM</td>
+        <td>.channel_delete</td>
+        <td>Permission to delete channel</td>
     </tr>
 </table>
 
@@ -1391,6 +1468,283 @@ Delete the route.
 		<td>2</td>
 		<td>name</td>
 		<td>the route name</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+## Channel methods
+
+### int emq\_channel\_create(emq\_client *client, const char *name, uint32\_t flags);
+Create the channel.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>flags</td>
+		<td>flags to create a channel (EMQ_CHANNEL_NONE, EMQ_CHANNEL_AUTODELETE, EMQ_CHANNEL_ROUND_ROBIN, EMQ_CHANNEL_DURABLE)</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_exist(emq\_client *client, const char *name);
+Check the channel of existence.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+</table>
+
+Return: Value greater than 0 if the channel exists.
+
+### emq\_list *emq\_channel\_list(emq\_client *client);
+Get a list of channels.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+</table>
+
+Return: list of channels.
+
+### int emq\_channel\_rename(emq\_client *client, const char *from, const char *to);
+Rename the channel.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>from</td>
+		<td>the old channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>to</td>
+		<td>the new channel name</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_publish(emq\_client *client, const char *name, const char *topic, emq\_msg *msg);
+Publish a message to the channel.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>topic</td>
+		<td>the channel topic</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>msg</td>
+		<td>the message</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_subscribe(emq\_client *client, const char *name, const char *topic, emq\_msg\_callback *callback);
+Subscribe to the channel by topic.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>topic</td>
+		<td>the channel topic</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>callback</td>
+		<td>callback to the event subscription</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_psubscribe(emq\_client *client, const char *name, const char *pattern, emq\_msg\_callback *callback);
+Subscribe to the channel by pattern.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>pattern</td>
+		<td>the channel pattern</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>callback</td>
+		<td>callback to the event subscription</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_unsubscribe(emq\_client *client, const char *name, const char *topic);
+Unsubscribe from the channel by topic.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>topic</td>
+		<td>the channel topic</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_punsubscribe(emq\_client *client, const char *name, const char *pattern);
+Unsubscribe from the channel by pattern.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>pattern</td>
+		<td>the channel pattern</td>
+	</tr>
+</table>
+
+Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
+
+### int emq\_channel\_delete(emq\_client *client, const char *name);
+Delete the channel.
+
+<table border="1">
+	<tr>
+		<td><b>№</b></td>
+		<td><b>Name</b></td>
+		<td><b>Description</b></td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>client</td>
+		<td>the context of a client connection</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>name</td>
+		<td>the channel name</td>
 	</tr>
 </table>
 
