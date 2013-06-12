@@ -12,7 +12,7 @@ COMPILE_LDFLAGS=$(LDFLAGS)
 EXAMPLES_DIR=examples
 
 OBJ=emq.o network.o packet.o
-BINS=example-simple example-queue-subscribe example-channel-subscribe benchmark
+BINS=$(EXAMPLES_DIR)/simple $(EXAMPLES_DIR)/queue-subscribe $(EXAMPLES_DIR)/channel-subscribe benchmark
 
 DYNAMIC_LIB_SUFFIX=so
 STATIC_LIB_SUFFIX=a
@@ -34,13 +34,13 @@ $(STATIC_LIB_NAME): $(OBJ)
 dynamic: $(DYNAMIC_LIB_NAME)
 static: $(STATIC_LIB_NAME)
 
-example-simple: $(STATIC_LIB_NAME)
+$(EXAMPLES_DIR)/simple: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/simple.c -I. $(STATIC_LIB_NAME)
 
-example-queue-subscribe: $(STATIC_LIB_NAME)
+$(EXAMPLES_DIR)/queue-subscribe: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/queue-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
 
-example-channel-subscribe: $(STATIC_LIB_NAME)
+$(EXAMPLES_DIR)/channel-subscribe: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/channel-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
 
 benchmark: $(STATIC_LIB_NAME)
