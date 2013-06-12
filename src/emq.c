@@ -1444,7 +1444,7 @@ error:
 	return NULL;
 }
 
-emq_msg *emq_queue_pop(emq_client *client, const char *name, uint32_t timeout)
+emq_msg *emq_queue_pop(emq_client *client, const char *name, emq_time timeout)
 {
 	protocol_response_header header;
 	emq_msg *msg;
