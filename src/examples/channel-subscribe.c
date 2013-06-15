@@ -64,7 +64,7 @@ int channel_message_callback(emq_client *client, int type, const char *name,
 
 	if (++message_counter >= MESSAGES) {
 		emq_noack_enable(client);
-		printf(YELLOW("[Success]") " [Event] Channel unsubscribe\n");
+		printf(YELLOW("[Success]") " [Event] Channel punsubscribe\n");
 		emq_channel_punsubscribe(client, ".channel-test", "world.belarus.*");
 		emq_noack_disable(client);
 		emq_msg_release(msg);
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 		CHECK_STATUS("Channel create", status);
 
 		status = emq_channel_psubscribe(client, ".channel-test", "world.belarus.*", channel_message_callback);
-		CHECK_STATUS("Channel subscribe", status);
+		CHECK_STATUS("Channel psubscribe", status);
 
 		init_worker(&thread1);
 		init_worker(&thread2);
