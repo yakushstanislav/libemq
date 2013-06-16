@@ -404,7 +404,6 @@ static void channel_management(emq_client *client)
 	emq_channel *channel; /* channel */
 	emq_list_iterator iter; /* list iterator */
 	emq_list_node *node; /* list node */
-	int messages;
 	int status;
 
 	/* Create channel with name ".channel_1" */
@@ -452,7 +451,7 @@ static void channel_management(emq_client *client)
 	CHECK_STATUS("Channel delete", status);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	/* Connect to server */
 	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);

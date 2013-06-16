@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <pthread.h>
 
 #include "emq.h"
@@ -16,6 +17,8 @@
 	else \
 		printf(RED("[Error]") " %s\n", text);
 
+#define NOTUSED(X) ((void)X)
+
 #define ADDR "localhost"
 
 #define TEST_MESSAGE "Hello EagleMQ"
@@ -28,9 +31,11 @@ pthread_t thread;
 void *worker(void *data)
 {
 	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);
-	emq_msg *msg = emq_msg_create(TEST_MESSAGE, strlen(TEST_MESSAGE) + 1, EMQ_ZEROCOPY_ON);
+	emq_msg *msg = emq_msg_create((char*)TEST_MESSAGE, strlen(TEST_MESSAGE) + 1, EMQ_ZEROCOPY_ON);
 	int status;
 	int i;
+
+	NOTUSED(data);
 
 	if (client != NULL) {
 		printf(YELLOW("[Success]") " [Worker] Connected to %s:%d\n", ADDR, EMQ_DEFAULT_PORT);
@@ -60,6 +65,10 @@ void *worker(void *data)
 int queue_message_callback(emq_client *client, int type, const char *name,
 	const char *topic, const char *pattern, emq_msg *msg)
 {
+	NOTUSED(type);
+	NOTUSED(topic);
+	NOTUSED(pattern);
+
 	printf(YELLOW("[Success]") " [Event] Message \'%s\' in queue %s\n", (char*)emq_msg_data(msg), name);
 
 	if (++message_counter >= MESSAGES) {
@@ -84,7 +93,7 @@ void init_worker(void)
 	}
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	emq_client *client = emq_tcp_connect(ADDR, EMQ_DEFAULT_PORT);
 	int status;

@@ -6,7 +6,7 @@ CC:=gcc
 OPTIMIZATION?=-O2
 WARNINGS=-Wall -W -Wstrict-prototypes -Wwrite-strings
 DEBUG?=-g -ggdb
-COMPILE_CFLAGS=$(OPTIMIZATION) -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG)
+COMPILE_CFLAGS=$(OPTIMIZATION) -std=c99 -pedantic -fPIC $(CFLAGS) $(WARNINGS) $(DEBUG)
 COMPILE_LDFLAGS=$(LDFLAGS)
 
 EXAMPLES_DIR=examples
@@ -35,19 +35,19 @@ dynamic: $(DYNAMIC_LIB_NAME)
 static: $(STATIC_LIB_NAME)
 
 $(EXAMPLES_DIR)/simple: $(STATIC_LIB_NAME)
-	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/simple.c -I. $(STATIC_LIB_NAME)
+	$(CC) -o $@ ${COMPILE_CFLAGS} $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/simple.c -I. $(STATIC_LIB_NAME)
 
 $(EXAMPLES_DIR)/queue-subscribe: $(STATIC_LIB_NAME)
-	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/queue-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
+	$(CC) -o $@ ${COMPILE_CFLAGS} $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/queue-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
 
 $(EXAMPLES_DIR)/channel-subscribe: $(STATIC_LIB_NAME)
-	$(CC) -o $@ $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/channel-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
+	$(CC) -o $@ ${COMPILE_CFLAGS} $(COMPILE_LDFLAGS) $(EXAMPLES_DIR)/channel-subscribe.c -I. $(STATIC_LIB_NAME) -lpthread
 
 benchmark: $(STATIC_LIB_NAME)
 	$(CC) -o $@ $(COMPILE_LDFLAGS) benchmark.c $(STATIC_LIB_NAME) -lpthread
 
 .c.o:
-	$(CC) -std=c99 -pedantic -c $(COMPILE_CFLAGS) $<
+	$(CC) -c $(COMPILE_CFLAGS) $<
 
 clean:
 	rm -rf $(DYNAMIC_LIB_NAME) $(STATIC_LIB_NAME) $(BINS) *.o *.gcda *.gcno *.gcov
