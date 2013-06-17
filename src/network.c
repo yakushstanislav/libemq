@@ -177,7 +177,11 @@ int emq_client_write(emq_client *client, char *buf, int count)
 
 int emq_client_writev(emq_client *client, struct iovec *iov, int iovcnt)
 {
-	return writev(client->fd, iov, iovcnt);
+	int ret;
+
+	while ((ret = writev(client->fd, iov, iovcnt)) == -1 && errno == EINTR);
+
+	return ret;
 }
 
 void emq_client_disconnect(emq_client *client)
