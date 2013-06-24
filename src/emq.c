@@ -1504,19 +1504,22 @@ int emq_queue_confirm(emq_client *client, const char *name, emq_tag tag)
 		goto error;
 	}
 
-	if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
-		emq_client_set_error(client, EMQ_ERROR_READ);
-		goto error;
-	}
+	if (!client->noack)
+	{
+		if (emq_client_read(client, (char*)&header, sizeof(header)) == -1) {
+			emq_client_set_error(client, EMQ_ERROR_READ);
+			goto error;
+		}
 
-	if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_CONFIRM) == EMQ_STATUS_ERR) {
-		emq_client_set_error(client, EMQ_ERROR_RESPONSE);
-		goto error;
-	}
+		if (emq_check_response_header_mini(&header, EMQ_PROTOCOL_CMD_QUEUE_CONFIRM) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, EMQ_ERROR_RESPONSE);
+			goto error;
+		}
 
-	if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
-		emq_client_set_error(client, emq_get_error(&header));
-		goto error;
+		if (emq_check_status(&header, EMQ_PROTOCOL_STATUS_SUCCESS) == EMQ_STATUS_ERR) {
+			emq_client_set_error(client, emq_get_error(&header));
+			goto error;
+		}
 	}
 
 	EMQ_SET_STATUS(client, EMQ_STATUS_OK);
