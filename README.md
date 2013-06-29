@@ -10,7 +10,7 @@ It has been designed to be light on memory usage, high performance, and provide 
 ### emq\_client *emq\_tcp\_connect(const char *addr, int port);
 Connect to the EagleMQ server via TCP protocol.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -33,7 +33,7 @@ Return: emq\_client on success, NULL on error.
 ### emq\_client *emq\_unix\_connect(const char *path);
 Connect to the EagleMQ server via unix domain socket.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -51,7 +51,7 @@ Return: emq\_client on success, NULL on error.
 ### void emq\_disconnect(emq\_client *client);
 Disconnects the client from the server and removes the connection context.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -71,7 +71,7 @@ When enabled, the server does not respond to commands status messages and the re
 Using this option is useful for performance.
 Also, it should be used to send commands if you are subscribed to the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -87,7 +87,7 @@ Also, it should be used to send commands if you are subscribed to the queue.
 ### void emq\_noack\_disable(emq\_client *client);
 Disable noack mode.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -103,7 +103,7 @@ Disable noack mode.
 ### int emq\_process(emq\_client *client);
 Processing of all server events.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -121,7 +121,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### void emq\_list\_rewind(emq\_list *list, emq\_list\_iterator *iter);
 Initialize the list iterator.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -145,7 +145,7 @@ Initialize the list iterator.
 ### emq\_list\_node *emq\_list\_next(emq\_list\_iterator *iter);
 Gets the next value list.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -163,7 +163,7 @@ Return: emq\_list\_node.
 ### void emq\_list\_release(emq\_list *list);
 Delete list.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -179,7 +179,7 @@ Delete list.
 ### char *emq\_last\_error(emq\_client *client);
 Description of the last error client.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -204,7 +204,7 @@ Return: version libemq.
 ### emq\_msg *emq\_msg\_create(void *data, size\_t size, int zero\_copy);
 Create a new message.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -232,7 +232,7 @@ Return: new message.
 ### emq\_msg *emq\_msg\_copy(emq\_msg *msg);
 Copy the message.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -250,7 +250,7 @@ Return: copy of the message.
 ### void emq\_msg\_expire(emq\_msg *msg, emq\_time time);
 Set expiration time for message.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -271,7 +271,7 @@ Set expiration time for message.
 ### void *emq\_msg\_data(emq\_msg *msg);
 Get the message data.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -289,7 +289,7 @@ Return: message data.
 ### size\_t emq\_msg\_size(emq\_msg *msg);
 Get the message size.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -307,7 +307,7 @@ Return: size of the message.
 ### emq\_tag emq\_msg\_tag(emq\_msg *msg);
 Get tag of the message.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -325,7 +325,7 @@ Return: tag of the message.
 ### void emq\_msg\_release(emq\_msg *msg)
 Delete the message.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -343,7 +343,7 @@ Delete the message.
 ### int emq\_auth(emq\_client *client, const char *name, const char *password);
 Client authentication on the server.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -371,7 +371,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_ping(emq\_client *client);
 Ping server. Used to check the server status.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -389,7 +389,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_stat(emq\_client *client, emq\_status *status);
 Get server statistics.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -415,7 +415,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq_save(emq_client *client, uint8_t async);
 Saving data to disk.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -438,7 +438,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_flush(emq\_client *client, uint32\_t flags);
 Deleting the data on the server.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -463,7 +463,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_user\_create(emq\_client *client, const char *name, const char *password, emq\_perm perm);
 Create a new user.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -496,7 +496,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### emq\_list *emq\_user\_list(emq\_client *client);
 Get a list of all users.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -514,7 +514,7 @@ Return: list of users.
 ### int emq\_user\_rename(emq\_client *client, const char *from, const char *to);
 Rename the user.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -542,7 +542,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_user\_set\_perm(emq\_client *client, const char *name, emq\_perm perm);
 Set permissions to the user.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -570,7 +570,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_user\_delete(emq\_client *client, const char *name);
 Delete the user.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -592,7 +592,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 
 ## Table 1. Description of user permissions
 
-<table border="1">
+<table>
     <tr>
         <td><b>№</b></td>
         <td><b>Name</b></td>
@@ -870,7 +870,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_create(emq\_client *client, const char *name, uint32\_t max\_msg, uint32\_t max\_msg\_size, uint32\_t flags);
 Create the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -908,7 +908,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_declare(emq\_client *client, const char *name);
 Declare the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -931,7 +931,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_exist(emq\_client *client, const char *name);
 Check the queue of existence.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -954,7 +954,7 @@ Return: Value greater than 0 if the queue exists.
 ### emq\_list *emq\_queue\_list(emq\_client *client);
 Get a list of queues.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -972,7 +972,7 @@ Return: list of queues.
 ### int emq\_queue\_rename(emq\_client *client, const char *from, const char *to);
 Rename the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1000,7 +1000,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### size\_t emq\_queue\_size(emq\_client *client, const char *name);
 Get the number of elements in the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1023,7 +1023,7 @@ Return: number of elements in the queue.
 ### int emq\_queue\_push(emq\_client *client, const char *name, emq\_msg *msg);
 Push a message to the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1051,7 +1051,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### emq\_msg *emq\_queue\_get(emq\_client *client, const char *name);
 Get a message from the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1074,7 +1074,7 @@ Return: message on success, NULL on error.
 ### emq\_msg *emq\_queue\_pop(emq\_client *client, const char *name, uint32\_t timeout);
 Pop a message from the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1102,7 +1102,7 @@ Return: message on success, NULL on error.
 ### int emq\_queue\_confirm(emq\_client *client, const char *name, emq\_tag tag);
 Confirm delivery message.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1130,7 +1130,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_subscribe(emq\_client *client, const char *name, uint32\_t flags, emq\_msg\_callback *callback);
 Subscribe to the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1163,7 +1163,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_unsubscribe(emq\_client *client, const char *name);
 Unsubscribe from the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1186,7 +1186,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_purge(emq\_client *client, const char *name);
 Purge the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1209,7 +1209,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_queue\_delete(emq\_client *client, const char *name);
 Delete the queue.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1234,7 +1234,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_route\_create(emq\_client *client, const char *name, uint32_t flags);
 Create the route.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1262,7 +1262,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_route\_exist(emq\_client *client, const char *name);
 Check the route of existence.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1285,7 +1285,7 @@ Return: Value greater than 0 if the route exists.
 ### emq\_list *emq\_route\_list(emq\_client *client);
 Get a list of route.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1303,7 +1303,7 @@ Return: list of routes.
 ### int emq\_route\_rename(emq\_client *client, const char *from, const char *to);
 Rename the route.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1331,7 +1331,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### emq\_list *emq\_route\_keys(emq\_client *client, const char *name);
 Get a list of route keys.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1354,7 +1354,7 @@ Return: list of route keys.
 ### int emq\_route\_bind(emq\_client *client, const char *name, const char *queue, const char *key);
 Bind the route with queue by key.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1387,7 +1387,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_route\_unbind(emq\_client *client, const char *name, const char *queue, const char *key);
 Unbind the route from queue by a key.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1420,7 +1420,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_route\_push(emq\_client *client, const char *name, const char *key, emq_msg *msg);
 Push a message to the route.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1453,7 +1453,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_route\_delete(emq\_client *client, const char *name);
 Delete the route.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1478,7 +1478,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_create(emq\_client *client, const char *name, uint32\_t flags);
 Create the channel.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1506,7 +1506,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_exist(emq\_client *client, const char *name);
 Check the channel of existence.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1529,7 +1529,7 @@ Return: Value greater than 0 if the channel exists.
 ### emq\_list *emq\_channel\_list(emq\_client *client);
 Get a list of channels.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1547,7 +1547,7 @@ Return: list of channels.
 ### int emq\_channel\_rename(emq\_client *client, const char *from, const char *to);
 Rename the channel.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1575,7 +1575,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_publish(emq\_client *client, const char *name, const char *topic, emq\_msg *msg);
 Publish a message to the channel.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1608,7 +1608,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_subscribe(emq\_client *client, const char *name, const char *topic, emq\_msg\_callback *callback);
 Subscribe to the channel by topic.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1641,7 +1641,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_psubscribe(emq\_client *client, const char *name, const char *pattern, emq\_msg\_callback *callback);
 Subscribe to the channel by pattern.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1674,7 +1674,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_unsubscribe(emq\_client *client, const char *name, const char *topic);
 Unsubscribe from the channel by topic.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1702,7 +1702,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_punsubscribe(emq\_client *client, const char *name, const char *pattern);
 Unsubscribe from the channel by pattern.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
@@ -1730,7 +1730,7 @@ Return: EMQ\_STATUS\_OK on success, EMQ\_STATUS\_ERR on error.
 ### int emq\_channel\_delete(emq\_client *client, const char *name);
 Delete the channel.
 
-<table border="1">
+<table>
 	<tr>
 		<td><b>№</b></td>
 		<td><b>Name</b></td>
